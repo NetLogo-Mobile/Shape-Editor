@@ -10,11 +10,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      name: Checkout code
-      uses: actions/checkout@v2
-      with:
-        runs-on: ubuntu-latest
-        node-version: '16'
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Install node 16
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16.x
 
       - name: Install dependencies
         run: |
