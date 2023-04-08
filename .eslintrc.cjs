@@ -1,6 +1,6 @@
 module.exports = {
-    extends: ["eslint:recommended", "plugin:prettier/recommended", "plugin:svelte3/recommended"],
-    plugins: ["svelte3"],
+  extends: ["eslint:recommended", "plugin:prettier/recommended"],
+  plugins: ["svelte3"],
     parserOptions: {
       ecmaVersion: 2020,
       sourceType: "module",
