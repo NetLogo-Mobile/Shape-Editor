@@ -6,7 +6,7 @@
     { id: 4, name: 'down-arrow', image: 'down-arrow.png' },
     { id: 5, name: 'down-arrow', image: 'down-arrow.png' },
     { id: 5, name: 'down-arrow', image: 'down-arrow.png' },
-    { id: 5, name: 'down-arrow', image: 'down-arrow.png' }
+    { id: 5, name: 'down-arrow', image: 'down-arrow.png' },
   ];
 
   let searchTerm = '';
@@ -20,22 +20,24 @@
   }
 
   function duplicateShape(id) {
-  const shapeToDuplicate = shapes.find(shape => shape.id === id);
-  if (shapeToDuplicate) {
-    const duplicatedShape = { ...shapeToDuplicate }; 
-    duplicatedShape.id = Math.max(...shapes.map(shape => shape.id)) + 1;
-    shapes.splice(shapes.findIndex(shape => shape.id === id) + 1, 0, duplicatedShape); 
+    const shapeToDuplicate = shapes.find((shape) => shape.id === id);
+    if (shapeToDuplicate) {
+      const duplicatedShape = { ...shapeToDuplicate };
+      duplicatedShape.id = Math.max(...shapes.map((shape) => shape.id)) + 1;
+      shapes.splice(
+        shapes.findIndex((shape) => shape.id === id) + 1,
+        0,
+        duplicatedShape,
+      );
+    }
   }
-}
 
-
-function deleteShape(id) {
-  const shapeIndexToDelete = shapes.findIndex(shape => shape.id === id);
-  if (shapeIndexToDelete !== -1) {
-    shapes.splice(shapeIndexToDelete, 1); 
+  function deleteShape(id) {
+    const shapeIndexToDelete = shapes.findIndex((shape) => shape.id === id);
+    if (shapeIndexToDelete !== -1) {
+      shapes.splice(shapeIndexToDelete, 1);
+    }
   }
-}
-
 </script>
 
 <style>
@@ -69,8 +71,6 @@ function deleteShape(id) {
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
     border-radius: 5px 5px 0px 0px;
   }
-
-
 
   .shape-selector-dialog .shape-selector-header h2 {
     font-family: 'Lato';
@@ -252,7 +252,7 @@ function deleteShape(id) {
     background-size: 10px;
     padding-left: 20px;
   }
-  
+
   .shape-selector-dialog .shape-selector-grid {
     flex: 1;
     overflow: hidden;
@@ -311,64 +311,63 @@ function deleteShape(id) {
     margin-right: 1px;
   }
 
-  .shape-selector-dialog .duplicate-icon{
-      width: 10px; 
-      height: 10px;
-      display: inline-block;
-      background-image: url('/duplicate-icon.png');
-      background-repeat: no-repeat;
-      background-position: center center;
-      background-size: contain; 
-      cursor: pointer;
-    }
+  .shape-selector-dialog .duplicate-icon {
+    width: 10px;
+    height: 10px;
+    display: inline-block;
+    background-image: url('/duplicate-icon.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: contain;
+    cursor: pointer;
+  }
 
-    .shape-selector-dialog .delete-icon{
-      width: 20px; 
-      height: 20px;
-      display: inline-block;
-      background-image: url('/delete-icon.png');
-      background-repeat: no-repeat;
-      background-position: center center;
-      background-size: contain; 
-      cursor: pointer;
-    }
-    .shape-selector-dialog .shape-selector-details{
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: center; 
-      align-items: center; 
-    }
-    .shape-selector-dialog .shape-selector-item-image-div{
-      width: 40.64px;
-      height: 42px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
+  .shape-selector-dialog .delete-icon {
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    background-image: url('/delete-icon.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: contain;
+    cursor: pointer;
+  }
+  .shape-selector-dialog .shape-selector-details {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .shape-selector-dialog .shape-selector-item-image-div {
+    width: 40.64px;
+    height: 42px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 
-    .shape-selector-dialog .shape-selector-item-image{
-      width: 30px;
-      height: 30px;
-    }
+  .shape-selector-dialog .shape-selector-item-image {
+    width: 30px;
+    height: 30px;
+  }
 
-    .shape-selector-dialog .shape-selector-item-name{
-      width: 64px;
-      height: 9px;
-      font-family: 'Lato';
-      font-style: normal;
-      font-weight: 700;
-      font-size: 10px;
-      line-height: 12px;
-      display: flex;
-      align-items: center;
-      text-align: center;
-      justify-content: center;
-      color: #7D7D7D;
-      margin-top: 4px;
-    }
-
+  .shape-selector-dialog .shape-selector-item-name {
+    width: 64px;
+    height: 9px;
+    font-family: 'Lato';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 10px;
+    line-height: 12px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    color: #7d7d7d;
+    margin-top: 4px;
+  }
 </style>
 
 <div class="shape-selector-dialog">
@@ -383,18 +382,34 @@ function deleteShape(id) {
         <div class="selector-buttons">
           <div class="mode-selector-buttons">
             <button class="turtle-button" on:click={() => console.log('turtle')}
-              ><img class="button-image-left" src="turtle-icon.png" alt="turtle button" />Turtle</button
+              ><img
+                class="button-image-left"
+                src="turtle-icon.png"
+                alt="turtle button"
+              />Turtle</button
             >
             <button class="link-button" on:click={() => console.log('link')}
-              ><img class="button-image-left" src="link-icon.png" alt="link button" />Link</button
+              ><img
+                class="button-image-left"
+                src="link-icon.png"
+                alt="link button"
+              />Link</button
             >
           </div>
           <div class="shape-selector-buttons">
             <button class="create-new-button" on:click={createShape}
-              ><img class="button-image-right" src="create-new-icon.png" alt="create new"/>Create New</button
+              ><img
+                class="button-image-right"
+                src="create-new-icon.png"
+                alt="create new"
+              />Create New</button
             >
             <button class="import-shapes-button" on:click={importShapes}
-              ><img class="button-image-right" src="import-icon.png" alt="import"/>Import From...</button
+              ><img
+                class="button-image-right"
+                src="import-icon.png"
+                alt="import"
+              />Import From...</button
             >
           </div>
         </div>
@@ -417,15 +432,15 @@ function deleteShape(id) {
               {#if shape.hover}
                 <div class="shape-selector-item-buttons">
                   <div
-                  on:click={() => duplicateShape(shape.id)}
-                  on:keydown={(event) => {
-                    if (event.key === 'Enter') duplicateShape(shape.id);
-                  }}
-                  role="button"
-                  tabindex="0"
-                  aria-label="Duplicate shape"
-                  class="duplicate-icon"
-                ></div>                
+                    on:click={() => duplicateShape(shape.id)}
+                    on:keydown={(event) => {
+                      if (event.key === 'Enter') duplicateShape(shape.id);
+                    }}
+                    role="button"
+                    tabindex="0"
+                    aria-label="Duplicate shape"
+                    class="duplicate-icon"
+                  />
                   <div
                     on:click={() => deleteShape(shape.id)}
                     on:keydown={(event) => {
@@ -435,13 +450,16 @@ function deleteShape(id) {
                     tabindex="0"
                     aria-label="Delete shape"
                     class="delete-icon"
-                  >
-                  </div>
+                  />
                 </div>
               {/if}
               <div class="shape-selector-details">
                 <div class="shape-selector-item-image-div">
-                  <img class="shape-selector-item-image" src={shape.image} alt="" />
+                  <img
+                    class="shape-selector-item-image"
+                    src={shape.image}
+                    alt=""
+                  />
                 </div>
                 <div class="shape-selector-item-name">{shape.name}</div>
               </div>
