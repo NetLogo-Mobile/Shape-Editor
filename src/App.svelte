@@ -24,6 +24,7 @@
   }
 
   function duplicateShape(id) {
+    console.log(id)
     // const shapeToDuplicate = shapes.find((shape) => shape.id === id);
     // if (shapeToDuplicate) {
     //   const duplicatedShape = { ...shapeToDuplicate };
@@ -37,6 +38,7 @@
   }
 
   function deleteShape(id) {
+    console.log(id)
     // const shapeIndexToDelete = shapes.findIndex((shape) => shape.id === id);
     // if (shapeIndexToDelete !== -1) {
     //   shapes.splice(shapeIndexToDelete, 1);
@@ -303,9 +305,25 @@
     pointer-events: none;
   }
 
+  .shape-selector-dialog .duplicate-icon {
+    width: 16px;
+    height: 16px;
+    padding: 3px;
+    box-sizing: border-box;
+    background: #ffffff;
+    border: 0.7px solid #cecece;
+    border-radius: 2px;
+    padding: 2.5px;
+    margin-right: 1px;
+    display: inline-block;
+    background-image: url('/duplicate-icon.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: contain;
+    background-size: 10px 10px;
+  }
 
-
-  .shape-selector-dialog .shape-selector-item-buttons div {
+  .shape-selector-dialog .delete-icon {
     width: 16px;
     height: 16px;
     box-sizing: border-box;
@@ -314,32 +332,14 @@
     border-radius: 2px;
     padding: 2.5px;
     margin-right: 1px;
-  }
-
-  .shape-selector-dialog .duplicate-icon {
-    width: 10px;
-    height: 10px;
     display: inline-block;
-    /* background-image: url('/public/duplicate-icon.png');
+    background-image: url('/delete-icon.png');
     background-repeat: no-repeat;
     background-position: center center;
-    background-size: contain; */
+    background-size: contain;
+    background-size: 10px 10px;
   }
 
-  .shape-selector-dialog .delete-icon {
-    width: 20px;
-    height: 20px;
-    display: inline-block;
-    /* background-image: url('/public/delete-icon.png');
-    background-repeat: no-repeat;
-    background-position: center center;
-    background-size: contain; */
-  }
-
-  .shape-selector-dialog .duplicate-icon:hover,
-.shape-selector-dialog .delete-icon:hover {
-  opacity: 1;
-}
   .shape-selector-dialog .shape-selector-details {
     width: 100%;
     height: 100%;
@@ -430,39 +430,37 @@
           {#each shapes.filter((shape) => shape.name
               .toLowerCase()
               .includes(searchTerm.toLowerCase())) as shape}
-            <div
-              class="shape-selector-item"
-            >
+            <div class="shape-selector-item">
               {#if shape.hover}
-              <div class="shape-selector-item-buttons">
-                <div
-                  on:click={() => duplicateShape(shape.id)}
-                  on:keydown={(event) => {
-                    if (event.key === 'Enter') duplicateShape(shape.id);
-                  }}
-                  role="button"
-                  tabindex="0"
-                  aria-label="Duplicate shape"
-                  class="duplicate-icon"
-                ></div>
-                <div
-                  on:click={() => deleteShape(shape.id)}
-                  on:keydown={(event) => {
-                    if (event.key === 'Enter') deleteShape(shape.id);
-                  }}
-                  role="button"
-                  tabindex="0"
-                  aria-label="Delete shape"
-                  class="delete-icon"
-                ></div>
-              </div>
-            {/if}
-            <div class="shape-selector-details"
-              on:mouseenter={() => (shape.hover = true)}
-              on:mouseleave={() => (shape.hover = false)}
-              on:focus={() => (shape.hover = true)}
-              on:blur={() => (shape.hover = false)}>
-            
+                <div class="shape-selector-item-buttons">
+                  <button
+                    on:click={() => duplicateShape(shape.id)}
+                    on:keydown={(event) => {
+                      if (event.key === 'Enter') duplicateShape(shape.id);
+                    }}
+          
+              
+                    aria-label="Duplicate shape"
+                    class="duplicate-icon"
+                  />
+                  <button
+                    on:click={() => deleteShape(shape.id)}
+                    on:keydown={(event) => {
+                      if (event.key === 'Enter') deleteShape(shape.id);
+                    }}
+             
+                    aria-label="Delete shape"
+                    class="delete-icon"
+                  />
+                </div>
+              {/if}
+              <div
+                class="shape-selector-details"
+                on:mouseenter={() => (shape.hover = true)}
+                on:mouseleave={() => (shape.hover = false)}
+                on:focus={() => (shape.hover = true)}
+                on:blur={() => (shape.hover = false)}
+              >
                 <div class="shape-selector-item-image-div">
                   <img
                     class="shape-selector-item-image"
@@ -471,10 +469,7 @@
                   />
                 </div>
                 <div class="shape-selector-item-name">{shape.name}</div>
-        
-              
-            </div>
-              
+              </div>
             </div>
           {/each}
         </div>
