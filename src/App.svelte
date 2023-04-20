@@ -5,8 +5,12 @@
     { id: 3, name: 'down-arrow', image: 'down-arrow.png' },
     { id: 4, name: 'down-arrow', image: 'down-arrow.png' },
     { id: 5, name: 'down-arrow', image: 'down-arrow.png' },
-    { id: 5, name: 'down-arrow', image: 'down-arrow.png' },
-    { id: 5, name: 'down-arrow', image: 'down-arrow.png' },
+    { id: 6, name: 'down-arrow', image: 'down-arrow.png' },
+    { id: 7, name: 'down-arrow', image: 'down-arrow.png' },
+    { id: 8, name: 'down-arrow', image: 'down-arrow.png' },
+    { id: 9, name: 'down-arrow', image: 'down-arrow.png' },
+    { id: 10, name: 'down-arrow', image: 'down-arrow.png' },
+    { id: 11, name: 'down-arrow', image: 'down-arrow.png' },
   ];
 
   let searchTerm = '';
@@ -20,23 +24,23 @@
   }
 
   function duplicateShape(id) {
-    const shapeToDuplicate = shapes.find((shape) => shape.id === id);
-    if (shapeToDuplicate) {
-      const duplicatedShape = { ...shapeToDuplicate };
-      duplicatedShape.id = Math.max(...shapes.map((shape) => shape.id)) + 1;
-      shapes.splice(
-        shapes.findIndex((shape) => shape.id === id) + 1,
-        0,
-        duplicatedShape,
-      );
-    }
+    // const shapeToDuplicate = shapes.find((shape) => shape.id === id);
+    // if (shapeToDuplicate) {
+    //   const duplicatedShape = { ...shapeToDuplicate };
+    //   duplicatedShape.id = Math.max(...shapes.map((shape) => shape.id)) + 1;
+    //   shapes.splice(
+    //     shapes.findIndex((shape) => shape.id === id) + 1,
+    //     0,
+    //     duplicatedShape,
+    //   );
+    // }
   }
 
   function deleteShape(id) {
-    const shapeIndexToDelete = shapes.findIndex((shape) => shape.id === id);
-    if (shapeIndexToDelete !== -1) {
-      shapes.splice(shapeIndexToDelete, 1);
-    }
+    // const shapeIndexToDelete = shapes.findIndex((shape) => shape.id === id);
+    // if (shapeIndexToDelete !== -1) {
+    //   shapes.splice(shapeIndexToDelete, 1);
+    // }
   }
 </script>
 
@@ -296,7 +300,10 @@
     right: 2px;
     display: flex;
     flex-direction: row;
+    pointer-events: none;
   }
+
+
 
   .shape-selector-dialog .shape-selector-item-buttons div {
     width: 16px;
@@ -313,23 +320,26 @@
     width: 10px;
     height: 10px;
     display: inline-block;
-    background-image: url('/duplicate-icon.png');
+    /* background-image: url('/public/duplicate-icon.png');
     background-repeat: no-repeat;
     background-position: center center;
-    background-size: contain;
-    cursor: pointer;
+    background-size: contain; */
   }
 
   .shape-selector-dialog .delete-icon {
     width: 20px;
     height: 20px;
     display: inline-block;
-    background-image: url('/delete-icon.png');
+    /* background-image: url('/public/delete-icon.png');
     background-repeat: no-repeat;
     background-position: center center;
-    background-size: contain;
-    cursor: pointer;
+    background-size: contain; */
   }
+
+  .shape-selector-dialog .duplicate-icon:hover,
+.shape-selector-dialog .delete-icon:hover {
+  opacity: 1;
+}
   .shape-selector-dialog .shape-selector-details {
     width: 100%;
     height: 100%;
@@ -422,36 +432,37 @@
               .includes(searchTerm.toLowerCase())) as shape}
             <div
               class="shape-selector-item"
-              on:mouseover={() => (shape.hover = true)}
-              on:mouseout={() => (shape.hover = false)}
-              on:focus={() => (shape.hover = true)}
-              on:blur={() => (shape.hover = false)}
             >
               {#if shape.hover}
-                <div class="shape-selector-item-buttons">
-                  <div
-                    on:click={() => duplicateShape(shape.id)}
-                    on:keydown={(event) => {
-                      if (event.key === 'Enter') duplicateShape(shape.id);
-                    }}
-                    role="button"
-                    tabindex="0"
-                    aria-label="Duplicate shape"
-                    class="duplicate-icon"
-                  />
-                  <div
-                    on:click={() => deleteShape(shape.id)}
-                    on:keydown={(event) => {
-                      if (event.key === 'Enter') deleteShape(shape.id);
-                    }}
-                    role="button"
-                    tabindex="0"
-                    aria-label="Delete shape"
-                    class="delete-icon"
-                  />
-                </div>
-              {/if}
-              <div class="shape-selector-details">
+              <div class="shape-selector-item-buttons">
+                <div
+                  on:click={() => duplicateShape(shape.id)}
+                  on:keydown={(event) => {
+                    if (event.key === 'Enter') duplicateShape(shape.id);
+                  }}
+                  role="button"
+                  tabindex="0"
+                  aria-label="Duplicate shape"
+                  class="duplicate-icon"
+                ></div>
+                <div
+                  on:click={() => deleteShape(shape.id)}
+                  on:keydown={(event) => {
+                    if (event.key === 'Enter') deleteShape(shape.id);
+                  }}
+                  role="button"
+                  tabindex="0"
+                  aria-label="Delete shape"
+                  class="delete-icon"
+                ></div>
+              </div>
+            {/if}
+            <div class="shape-selector-details"
+              on:mouseenter={() => (shape.hover = true)}
+              on:mouseleave={() => (shape.hover = false)}
+              on:focus={() => (shape.hover = true)}
+              on:blur={() => (shape.hover = false)}>
+            
                 <div class="shape-selector-item-image-div">
                   <img
                     class="shape-selector-item-image"
@@ -460,7 +471,10 @@
                   />
                 </div>
                 <div class="shape-selector-item-name">{shape.name}</div>
-              </div>
+        
+              
+            </div>
+              
             </div>
           {/each}
         </div>
