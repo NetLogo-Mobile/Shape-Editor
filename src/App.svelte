@@ -1,21 +1,16 @@
 <script>
   let shapes = [
-    { id: 1, name: 'down-arrow', image: 'down-arrow.png', type:'turtle' },
-    { id: 2, name: 'down-arrow', image: 'down-arrow.png', type:'turtle'  },
-    { id: 3, name: 'down-arrow', image: 'down-arrow.png',  type:'turtle' },
-    { id: 4, name: 'down-arrow', image: 'down-arrow.png', type:'turtle' },
-    { id: 5, name: 'down-arrow', image: 'down-arrow.png', type:'turtle'  },
-    { id: 6, name: 'down-arrow', image: 'down-arrow.png', type:'turtle'  },
-    { id: 7, name: 'down-arrow', image: 'down-arrow.png', type:'turtle'  },
-    { id: 8, name: 'down-arrow', image: 'down-arrow.png', type:'turtle'  },
-    { id: 9, name: 'down-arrow', image: 'down-arrow.png' , type:'turtle' },
-    { id: 10, name: 'down-arrow', image: 'down-arrow.png', type:'link'  },
-    { id: 11, name: 'down-arrow', image: 'down-arrow.png' , type:'link' },
+    { id: 1, name: 'down-arrow', image: 'down-arrow.png', type: 'turtle' },
+    { id: 2, name: 'apple', image: 'down-arrow.png', type: 'turtle' },
+    { id: 3, name: 'banana', image: 'down-arrow.png', type: 'turtle' },
+    { id: 4, name: 'peach', image: 'down-arrow.png', type: 'turtle' },
+    { id: 5, name: 'down-arrow', image: 'down-arrow.png', type: 'link' },
+    { id: 6, name: 'down-arrow', image: 'down-arrow.png', type: 'link' },
   ];
 
   let searchTerm = '';
   let filteredShapes = shapes;
-  let currentType = 'turtle'; 
+  let currentType = 'turtle';
 
   function createShape() {
     // Code to create a new shape
@@ -26,23 +21,37 @@
   }
 
   function duplicateShape(id) {
-    const shapeToDuplicate = shapes.find((shape) => shape.id === id);
-    if (shapeToDuplicate) {
-      const duplicatedShape = { ...shapeToDuplicate };
-      duplicatedShape.id = Math.max(...shapes.map((shape) => shape.id)) + 1;
-      shapes.splice(
-        shapes.findIndex((shape) => shape.id === id) + 1,
-        0,
-        duplicatedShape,
-      );
-    }
+  const shapeToDuplicate = shapes.find((shape) => shape.id === id);
+  if (shapeToDuplicate) {
+    const { name } = shapeToDuplicate;
+    const nameMatch = name.match(/^(.*?)(\s(\d+))?$/);
+    const baseName = nameMatch[1];
+    const existingIndices = shapes.reduce((acc, shape) => {
+      if (shape.name.startsWith(baseName)) {
+        const indexMatch = shape.name.match(/^.*\s(\d+)$/);
+        if (indexMatch) {
+          acc.push(Number(indexMatch[1]));
+        }
+      }
+      return acc;
+    }, []);
+    const insertIndex = shapes.findIndex((shape) => shape.id === id);
+    const newInsertIndex = existingIndices.length >= 1 ? shapes.findIndex((shape) => shape.name === `${baseName} ${Math.max(...existingIndices)}`) : insertIndex;
+    const newIndex = existingIndices.length ? Math.max(...existingIndices) + 1 : 1;
+    const newName = `${baseName} ${newIndex}`;
+    const duplicatedShape = { ...shapeToDuplicate, name: newName };
+    duplicatedShape.id = Math.max(...shapes.map((shape) => shape.id)) + 1;
+    shapes.splice(newInsertIndex + 1, 0, duplicatedShape);
   }
+  shapes = [...shapes];
+}
 
   function deleteShape(id) {
     const shapeIndexToDelete = shapes.findIndex((shape) => shape.id === id);
     if (shapeIndexToDelete !== -1) {
       shapes.splice(shapeIndexToDelete, 1);
     }
+    shapes = [...shapes];
   }
 
   function filterShapes(type) {
@@ -52,12 +61,11 @@
   $: {
     // Reactive statement to update filteredShapes whenever currentType or searchTerm changes
     filteredShapes = shapes.filter(
-      shape =>
+      (shape) =>
         shape.type === currentType &&
-        shape.name.toLowerCase().includes(searchTerm.toLowerCase())
+        shape.name.toLowerCase().includes(searchTerm.toLowerCase()),
     );
   }
-
 </script>
 
 <style>
@@ -120,7 +128,7 @@
     align-items: flex-start;
   }
 
-  .shape-selector-dialog .turtle-button{
+  .shape-selector-dialog .turtle-button {
     width: 50px;
     height: 20px;
     box-sizing: border-box;
@@ -318,7 +326,6 @@
     right: 2px;
     display: flex;
     flex-direction: row;
-    pointer-events: none;
   }
 
   .shape-selector-dialog .duplicate-icon {
@@ -406,14 +413,22 @@
         <h3>Selection Mode</h3>
         <div class="selector-buttons">
           <div class="mode-selector-buttons">
-            <button  class="turtle-button {currentType === 'turtle' ? 'selected-button' : 'unselected-button'}" on:click={() => filterShapes('turtle')}
+            <button
+              class="turtle-button {currentType === 'turtle'
+                ? 'selected-button'
+                : 'unselected-button'}"
+              on:click={() => filterShapes('turtle')}
               ><img
                 class="button-image-left"
                 src="turtle-icon.png"
                 alt="turtle button"
               />Turtle</button
             >
-            <button class="link-button {currentType === 'link' ? 'selected-button' : 'unselected-button'}" on:click={() => filterShapes('link')}
+            <button
+              class="link-button {currentType === 'link'
+                ? 'selected-button'
+                : 'unselected-button'}"
+              on:click={() => filterShapes('link')}
               ><img
                 class="button-image-left"
                 src="link-icon.png"
@@ -446,7 +461,6 @@
         <div class="shape-selector-grid-inner">
           {#each filteredShapes as shape (shape.id)}
             <div class="shape-selector-item">
-              {#if shape.hover}
                 <div class="shape-selector-item-buttons">
                   <button
                     on:click={() => duplicateShape(shape.id)}
@@ -455,6 +469,7 @@
                     }}
                     aria-label="Duplicate shape"
                     class="duplicate-icon"
+                    style="display: {shape.hover ? 'block' : 'none'};"
                   />
                   <button
                     on:click={() => deleteShape(shape.id)}
@@ -463,9 +478,9 @@
                     }}
                     aria-label="Delete shape"
                     class="delete-icon"
+                    style="display: {shape.hover ? 'block' : 'none'};"
                   />
                 </div>
-              {/if}
               <div
                 class="shape-selector-details"
                 on:mouseenter={() => (shape.hover = true)}
