@@ -1,19 +1,21 @@
 <script>
   let shapes = [
-    { id: 1, name: 'down-arrow', image: 'down-arrow.png' },
-    { id: 2, name: 'down-arrow', image: 'down-arrow.png' },
-    { id: 3, name: 'down-arrow', image: 'down-arrow.png' },
-    { id: 4, name: 'down-arrow', image: 'down-arrow.png' },
-    { id: 5, name: 'down-arrow', image: 'down-arrow.png' },
-    { id: 6, name: 'down-arrow', image: 'down-arrow.png' },
-    { id: 7, name: 'down-arrow', image: 'down-arrow.png' },
-    { id: 8, name: 'down-arrow', image: 'down-arrow.png' },
-    { id: 9, name: 'down-arrow', image: 'down-arrow.png' },
-    { id: 10, name: 'down-arrow', image: 'down-arrow.png' },
-    { id: 11, name: 'down-arrow', image: 'down-arrow.png' },
+    { id: 1, name: 'down-arrow', image: 'down-arrow.png', type:'turtle' },
+    { id: 2, name: 'down-arrow', image: 'down-arrow.png', type:'turtle'  },
+    { id: 3, name: 'down-arrow', image: 'down-arrow.png',  type:'turtle' },
+    { id: 4, name: 'down-arrow', image: 'down-arrow.png', type:'turtle' },
+    { id: 5, name: 'down-arrow', image: 'down-arrow.png', type:'turtle'  },
+    { id: 6, name: 'down-arrow', image: 'down-arrow.png', type:'turtle'  },
+    { id: 7, name: 'down-arrow', image: 'down-arrow.png', type:'turtle'  },
+    { id: 8, name: 'down-arrow', image: 'down-arrow.png', type:'turtle'  },
+    { id: 9, name: 'down-arrow', image: 'down-arrow.png' , type:'turtle' },
+    { id: 10, name: 'down-arrow', image: 'down-arrow.png', type:'link'  },
+    { id: 11, name: 'down-arrow', image: 'down-arrow.png' , type:'link' },
   ];
 
   let searchTerm = '';
+  let filteredShapes = shapes;
+  let currentType = 'turtle'; 
 
   function createShape() {
     // Code to create a new shape
@@ -24,26 +26,38 @@
   }
 
   function duplicateShape(id) {
-    console.log(id)
-    // const shapeToDuplicate = shapes.find((shape) => shape.id === id);
-    // if (shapeToDuplicate) {
-    //   const duplicatedShape = { ...shapeToDuplicate };
-    //   duplicatedShape.id = Math.max(...shapes.map((shape) => shape.id)) + 1;
-    //   shapes.splice(
-    //     shapes.findIndex((shape) => shape.id === id) + 1,
-    //     0,
-    //     duplicatedShape,
-    //   );
-    // }
+    const shapeToDuplicate = shapes.find((shape) => shape.id === id);
+    if (shapeToDuplicate) {
+      const duplicatedShape = { ...shapeToDuplicate };
+      duplicatedShape.id = Math.max(...shapes.map((shape) => shape.id)) + 1;
+      shapes.splice(
+        shapes.findIndex((shape) => shape.id === id) + 1,
+        0,
+        duplicatedShape,
+      );
+    }
   }
 
   function deleteShape(id) {
-    console.log(id)
-    // const shapeIndexToDelete = shapes.findIndex((shape) => shape.id === id);
-    // if (shapeIndexToDelete !== -1) {
-    //   shapes.splice(shapeIndexToDelete, 1);
-    // }
+    const shapeIndexToDelete = shapes.findIndex((shape) => shape.id === id);
+    if (shapeIndexToDelete !== -1) {
+      shapes.splice(shapeIndexToDelete, 1);
+    }
   }
+
+  function filterShapes(type) {
+    currentType = type; // Update currentType with the type clicked
+  }
+
+  $: {
+    // Reactive statement to update filteredShapes whenever currentType or searchTerm changes
+    filteredShapes = shapes.filter(
+      shape =>
+        shape.type === currentType &&
+        shape.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }
+
 </script>
 
 <style>
@@ -105,13 +119,11 @@
     flex-direction: column;
     align-items: flex-start;
   }
-  .shape-selector-dialog .turtle-button {
+
+  .shape-selector-dialog .turtle-button{
     width: 50px;
     height: 20px;
     box-sizing: border-box;
-    background: #5a648d;
-    border: 0.3px solid #cecece;
-    box-shadow: inset 0px 4px 4px rgba(0, 0, 0, 0.25);
     border-radius: 2px;
     font-family: 'Lato';
     font-style: normal;
@@ -120,20 +132,29 @@
     line-height: 11px;
     display: flex;
     align-items: center;
-    color: #ffffff;
     padding-left: 0px;
   }
+  .shape-selector-dialog .selected-button {
+    color: #ffffff;
+    background: #5a648d;
+    border: 0.3px solid #cecece;
+    box-shadow: inset 0px 4px 4px rgba(0, 0, 0, 0.25);
+  }
 
-  .shape-selector-dialog .turtle-button img {
+  .shape-selector-dialog .selected-button img {
     filter: invert(100%);
+  }
+
+  .shape-selector-dialog .unselected-button {
+    color: #000000;
+    background: #e5e5e5;
+    border: 0.3px solid #cecece;
   }
 
   .shape-selector-dialog .link-button {
     box-sizing: border-box;
     width: 44px;
     height: 20px;
-    background: #e5e5e5;
-    border: 0.3px solid #cecece;
     border-radius: 2px;
     font-family: 'Lato';
     font-style: normal;
@@ -142,7 +163,6 @@
     line-height: 11px;
     display: flex;
     align-items: center;
-    color: #000000;
     padding-left: 0px;
   }
   .shape-selector-dialog .button-image-left {
@@ -291,10 +311,6 @@
     border-radius: 3px;
   }
 
-  .shape-selector-dialog .shape-selector-details {
-    padding: 5px, 20px, 5px, 20px;
-  }
-
   .shape-selector-dialog .shape-selector-item-buttons {
     z-index: 1;
     position: absolute;
@@ -341,6 +357,7 @@
   }
 
   .shape-selector-dialog .shape-selector-details {
+    padding: 5px, 20px, 5px, 20px;
     width: 100%;
     height: 100%;
     display: flex;
@@ -389,14 +406,14 @@
         <h3>Selection Mode</h3>
         <div class="selector-buttons">
           <div class="mode-selector-buttons">
-            <button class="turtle-button" on:click={() => console.log('turtle')}
+            <button  class="turtle-button {currentType === 'turtle' ? 'selected-button' : 'unselected-button'}" on:click={() => filterShapes('turtle')}
               ><img
                 class="button-image-left"
                 src="turtle-icon.png"
                 alt="turtle button"
               />Turtle</button
             >
-            <button class="link-button" on:click={() => console.log('link')}
+            <button class="link-button {currentType === 'link' ? 'selected-button' : 'unselected-button'}" on:click={() => filterShapes('link')}
               ><img
                 class="button-image-left"
                 src="link-icon.png"
@@ -427,9 +444,7 @@
       </div>
       <div class="shape-selector-grid">
         <div class="shape-selector-grid-inner">
-          {#each shapes.filter((shape) => shape.name
-              .toLowerCase()
-              .includes(searchTerm.toLowerCase())) as shape}
+          {#each filteredShapes as shape (shape.id)}
             <div class="shape-selector-item">
               {#if shape.hover}
                 <div class="shape-selector-item-buttons">
@@ -438,8 +453,6 @@
                     on:keydown={(event) => {
                       if (event.key === 'Enter') duplicateShape(shape.id);
                     }}
-          
-              
                     aria-label="Duplicate shape"
                     class="duplicate-icon"
                   />
@@ -448,7 +461,6 @@
                     on:keydown={(event) => {
                       if (event.key === 'Enter') deleteShape(shape.id);
                     }}
-             
                     aria-label="Delete shape"
                     class="delete-icon"
                   />
