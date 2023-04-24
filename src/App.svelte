@@ -5,7 +5,7 @@
     { id: 3, name: 'banana', image: 'down-arrow.png', type: 'turtle' },
     { id: 4, name: 'peach', image: 'down-arrow.png', type: 'turtle' },
     { id: 5, name: 'down-arrow', image: 'down-arrow.png', type: 'link' },
-    { id: 6, name: 'down-arrow', image: 'down-arrow.png', type: 'link' },
+    { id: 6, name: 'down-arrow', image: 'down-arrow.png', type: 'link'},
   ];
 
   let searchTerm = '';
@@ -21,30 +21,38 @@
   }
 
   function duplicateShape(id) {
-  const shapeToDuplicate = shapes.find((shape) => shape.id === id);
-  if (shapeToDuplicate) {
-    const { name } = shapeToDuplicate;
-    const nameMatch = name.match(/^(.*?)(\s(\d+))?$/);
-    const baseName = nameMatch[1];
-    const existingIndices = shapes.reduce((acc, shape) => {
-      if (shape.name.startsWith(baseName)) {
-        const indexMatch = shape.name.match(/^.*\s(\d+)$/);
-        if (indexMatch) {
-          acc.push(Number(indexMatch[1]));
+    const shapeToDuplicate = shapes.find((shape) => shape.id === id);
+    if (shapeToDuplicate) {
+      const { name } = shapeToDuplicate;
+      const nameMatch = name.match(/^(.*?)(\s(\d+))?$/);
+      const baseName = nameMatch[1];
+      const existingIndices = shapes.reduce((acc, shape) => {
+        if (shape.name.startsWith(baseName)) {
+          const indexMatch = shape.name.match(/^.*\s(\d+)$/);
+          if (indexMatch) {
+            acc.push(Number(indexMatch[1]));
+          }
         }
-      }
-      return acc;
-    }, []);
-    const insertIndex = shapes.findIndex((shape) => shape.id === id);
-    const newInsertIndex = existingIndices.length >= 1 ? shapes.findIndex((shape) => shape.name === `${baseName} ${Math.max(...existingIndices)}`) : insertIndex;
-    const newIndex = existingIndices.length ? Math.max(...existingIndices) + 1 : 1;
-    const newName = `${baseName} ${newIndex}`;
-    const duplicatedShape = { ...shapeToDuplicate, name: newName };
-    duplicatedShape.id = Math.max(...shapes.map((shape) => shape.id)) + 1;
-    shapes.splice(newInsertIndex + 1, 0, duplicatedShape);
+        return acc;
+      }, []);
+      const insertIndex = shapes.findIndex((shape) => shape.id === id);
+      const newInsertIndex =
+        existingIndices.length >= 1
+          ? shapes.findIndex(
+              (shape) =>
+                shape.name === `${baseName} ${Math.max(...existingIndices)}`,
+            )
+          : insertIndex;
+      const newIndex = existingIndices.length
+        ? Math.max(...existingIndices) + 1
+        : 1;
+      const newName = `${baseName} ${newIndex}`;
+      const duplicatedShape = { ...shapeToDuplicate, name: newName };
+      duplicatedShape.id = Math.max(...shapes.map((shape) => shape.id)) + 1;
+      shapes.splice(newInsertIndex + 1, 0, duplicatedShape);
+    }
+    shapes = [...shapes];
   }
-  shapes = [...shapes];
-}
 
   function deleteShape(id) {
     const shapeIndexToDelete = shapes.findIndex((shape) => shape.id === id);
@@ -55,11 +63,10 @@
   }
 
   function filterShapes(type) {
-    currentType = type; // Update currentType with the type clicked
+    currentType = type;
   }
 
   $: {
-    // Reactive statement to update filteredShapes whenever currentType or searchTerm changes
     filteredShapes = shapes.filter(
       (shape) =>
         shape.type === currentType &&
@@ -320,8 +327,8 @@
   }
 
   .shape-selector-dialog .shape-selector-item-buttons {
-    z-index: 1;
     position: absolute;
+    z-index: 1;
     top: 3px;
     right: 2px;
     display: flex;
@@ -344,9 +351,11 @@
     background-position: center center;
     background-size: contain;
     background-size: 10px 10px;
+    margin-bottom: 0px;
   }
 
   .shape-selector-dialog .delete-icon {
+    z-index: 1;
     width: 16px;
     height: 16px;
     box-sizing: border-box;
@@ -361,10 +370,11 @@
     background-position: center center;
     background-size: contain;
     background-size: 10px 10px;
+    margin-bottom: 0px;
   }
 
   .shape-selector-dialog .shape-selector-details {
-    padding: 5px, 20px, 5px, 20px;
+    padding: 5px 20px 5px 20px;
     width: 100%;
     height: 100%;
     display: flex;
@@ -461,26 +471,26 @@
         <div class="shape-selector-grid-inner">
           {#each filteredShapes as shape (shape.id)}
             <div class="shape-selector-item">
-                <div class="shape-selector-item-buttons">
-                  <button
-                    on:click={() => duplicateShape(shape.id)}
-                    on:keydown={(event) => {
-                      if (event.key === 'Enter') duplicateShape(shape.id);
-                    }}
-                    aria-label="Duplicate shape"
-                    class="duplicate-icon"
-                    style="display: {shape.hover ? 'block' : 'none'};"
-                  />
-                  <button
-                    on:click={() => deleteShape(shape.id)}
-                    on:keydown={(event) => {
-                      if (event.key === 'Enter') deleteShape(shape.id);
-                    }}
-                    aria-label="Delete shape"
-                    class="delete-icon"
-                    style="display: {shape.hover ? 'block' : 'none'};"
-                  />
-                </div>
+              <div class="shape-selector-item-buttons">
+                <button
+                  on:click={() => duplicateShape(shape.id)}
+                  on:keydown={(event) => {
+                    if (event.key === 'Enter') duplicateShape(shape.id);
+                  }}
+                  aria-label="Duplicate shape"
+                  class="duplicate-icon"
+                  style="display: {shape.hover ? 'block' : 'none'};"
+                />
+                <button
+                  on:click={() => deleteShape(shape.id)}
+                  on:keydown={(event) => {
+                    if (event.key === 'Enter') deleteShape(shape.id);
+                  }}
+                  aria-label="Delete shape"
+                  class="delete-icon"
+                  style="display: {shape.hover ? 'block' : 'none'};"
+                />
+              </div>
               <div
                 class="shape-selector-details"
                 on:mouseenter={() => (shape.hover = true)}
