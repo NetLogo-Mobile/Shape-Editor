@@ -47,7 +47,7 @@
         ? Math.max(...existingIndices) + 1
         : 1;
       const newName = `${baseName} ${newIndex}`;
-      const duplicatedShape = { ...shapeToDuplicate, name: newName };
+      const duplicatedShape = { ...shapeToDuplicate, name: newName, hover:false };
       duplicatedShape.id = Math.max(...shapes.map((shape) => shape.id)) + 1;
       shapes.splice(newInsertIndex + 1, 0, duplicatedShape);
     }
@@ -317,7 +317,6 @@
     justify-content: center;
     align-items: center;
     background-color: #f2f2f2;
-
     width: 79px;
     height: 71px;
     margin: 0px;
@@ -374,13 +373,13 @@
   }
 
   .shape-selector-dialog .shape-selector-details {
-    padding: 5px 20px 5px 20px;
     width: 100%;
     height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    margin: 0px;
   }
   .shape-selector-dialog .shape-selector-item-image-div {
     width: 40.64px;
@@ -470,45 +469,45 @@
       <div class="shape-selector-grid">
         <div class="shape-selector-grid-inner">
           {#each filteredShapes as shape (shape.id)}
-            <div class="shape-selector-item">
-              <div class="shape-selector-item-buttons">
-                <button
-                  on:click={() => duplicateShape(shape.id)}
-                  on:keydown={(event) => {
-                    if (event.key === 'Enter') duplicateShape(shape.id);
-                  }}
-                  aria-label="Duplicate shape"
-                  class="duplicate-icon"
-                  style="display: {shape.hover ? 'block' : 'none'};"
-                />
-                <button
-                  on:click={() => deleteShape(shape.id)}
-                  on:keydown={(event) => {
-                    if (event.key === 'Enter') deleteShape(shape.id);
-                  }}
-                  aria-label="Delete shape"
-                  class="delete-icon"
-                  style="display: {shape.hover ? 'block' : 'none'};"
-                />
-              </div>
-              <div
-                class="shape-selector-details"
-                on:mouseenter={() => (shape.hover = true)}
-                on:mouseleave={() => (shape.hover = false)}
-                on:focus={() => (shape.hover = true)}
-                on:blur={() => (shape.hover = false)}
-              >
-                <div class="shape-selector-item-image-div">
-                  <img
-                    class="shape-selector-item-image"
-                    src={shape.image}
-                    alt=""
-                  />
-                </div>
-                <div class="shape-selector-item-name">{shape.name}</div>
-              </div>
+          <div class="shape-selector-item"
+          on:mouseenter={() => (shape.hover = true)}
+          on:mouseleave={() => (shape.hover = false)}
+          on:focus={() => (shape.hover = true)}
+          on:blur={() => (shape.hover = false)}>
+            <div class="shape-selector-item-buttons">
+              <button
+                on:click={() => duplicateShape(shape.id)}
+                on:keydown={(event) => {
+                  if (event.key === 'Enter') duplicateShape(shape.id);
+                }}
+                aria-label="Duplicate shape"
+                class="duplicate-icon"
+                style="display: {shape.hover ? 'block' : 'none'};"
+              ></button> <!-- Add closing tag for the button -->
+              <button
+                on:click={() => deleteShape(shape.id)}
+                on:keydown={(event) => {
+                  if (event.key === 'Enter') deleteShape(shape.id);
+                }}
+                aria-label="Delete shape"
+                class="delete-icon"
+                style="display: {shape.hover ? 'block' : 'none'};"
+              ></button> <!-- Add closing tag for the button -->
             </div>
-          {/each}
+            <div
+              class="shape-selector-details"
+            >
+              <div class="shape-selector-item-image-div">
+                <img
+                  class="shape-selector-item-image"
+                  src={shape.image}
+                  alt=""
+                />
+              </div>
+              <div class="shape-selector-item-name">{shape.name}</div>
+            </div>
+          </div>
+        {/each}        
         </div>
       </div>
     </div>
