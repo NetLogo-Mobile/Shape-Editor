@@ -1,79 +1,36 @@
 <script>
-  let shapes = [
-    { id: 1, name: 'down-arrow', image: 'down-arrow.png', type: 'turtle' },
-    { id: 2, name: 'apple', image: 'down-arrow.png', type: 'turtle' },
-    { id: 3, name: 'banana', image: 'down-arrow.png', type: 'turtle' },
-    { id: 4, name: 'peach', image: 'down-arrow.png', type: 'turtle' },
-    { id: 5, name: 'down-arrow', image: 'down-arrow.png', type: 'link' },
-    { id: 6, name: 'down-arrow', image: 'down-arrow.png', type: 'link'},
-  ];
+  import { GalapagosShapeSelectorDialog } from './GalapagosShapeSelectorDialog.ts';
+  import { onMount } from 'svelte';
 
-  let searchTerm = '';
-  let filteredShapes = shapes;
-  let currentType = 'turtle';
+  let ShapeSelectorDialog;
 
-  function createShape() {
-    // Code to create a new shape
-  }
+  onMount(() => {
+    ShapeSelectorDialog = new GalapagosShapeSelectorDialog(document.getElementById('Container'));
+  });
 
-  function importShapes() {
-    // Code to import shapes from a file
-  }
+  let searchTerm;
+  let currentType;
+  let filteredShapes = [];
 
-  function duplicateShape(id) {
-    const shapeToDuplicate = shapes.find((shape) => shape.id === id);
-    if (shapeToDuplicate) {
-      const { name } = shapeToDuplicate;
-      const nameMatch = name.match(/^(.*?)(\s(\d+))?$/);
-      const baseName = nameMatch[1];
-      const existingIndices = shapes.reduce((acc, shape) => {
-        if (shape.name.startsWith(baseName)) {
-          const indexMatch = shape.name.match(/^.*\s(\d+)$/);
-          if (indexMatch) {
-            acc.push(Number(indexMatch[1]));
-          }
-        }
-        return acc;
-      }, []);
-      const insertIndex = shapes.findIndex((shape) => shape.id === id);
-      const newInsertIndex =
-        existingIndices.length >= 1
-          ? shapes.findIndex(
-              (shape) =>
-                shape.name === `${baseName} ${Math.max(...existingIndices)}`,
-            )
-          : insertIndex;
-      const newIndex = existingIndices.length
-        ? Math.max(...existingIndices) + 1
-        : 1;
-      const newName = `${baseName} ${newIndex}`;
-      const duplicatedShape = { ...shapeToDuplicate, name: newName, hover:false };
-      duplicatedShape.id = Math.max(...shapes.map((shape) => shape.id)) + 1;
-      shapes.splice(newInsertIndex + 1, 0, duplicatedShape);
-    }
-    shapes = [...shapes];
-  }
-
-  function deleteShape(id) {
-    const shapeIndexToDelete = shapes.findIndex((shape) => shape.id === id);
-    if (shapeIndexToDelete !== -1) {
-      shapes.splice(shapeIndexToDelete, 1);
-    }
-    shapes = [...shapes];
-  }
-
-  function filterShapes(type) {
-    currentType = type;
-  }
-
+  // Update searchTerm, currentType, and filteredShapes when ShapeSelectorDialog changes
   $: {
-    filteredShapes = shapes.filter(
-      (shape) =>
-        shape.type === currentType &&
-        shape.name.toLowerCase().includes(searchTerm.toLowerCase()),
-    );
+    if (ShapeSelectorDialog) {
+      searchTerm = ShapeSelectorDialog.searchTerm;
+      currentType = ShapeSelectorDialog.currentType;
+      filteredShapes = ShapeSelectorDialog.filteredShapes;
+    }
   }
+  const handleCreateShape = () => {
+    // Call the createShape function on the shapeDialog instance
+    ShapeSelectorDialog.createShape();
+  };
+
+  const handleFilterShapes = (word) => {
+    ShapeSelectorDialog.filterShapes(word);
+  }
+
 </script>
+
 
 <style>
   .shape-selector-dialog .shape-selector {
@@ -148,6 +105,7 @@
     display: flex;
     align-items: center;
     padding-left: 0px;
+    cursor: pointer;
   }
   .shape-selector-dialog .selected-button {
     color: #ffffff;
@@ -179,6 +137,7 @@
     display: flex;
     align-items: center;
     padding-left: 0px;
+    cursor: pointer;
   }
   .shape-selector-dialog .button-image-left {
     width: 10px;
@@ -233,6 +192,7 @@
     align-items: center;
     color: #ffffff;
     text-shadow: 0px 2px 3px rgba(0, 0, 0, 0.25);
+    cursor: pointer;
   }
 
   .shape-selector-dialog .import-shapes-button {
@@ -253,6 +213,7 @@
 
     color: #ffffff;
     text-shadow: 0px 2px 3px rgba(0, 0, 0, 0.25);
+    cursor: pointer;
   }
 
   .shape-selector-dialog .shape-selector-buttons button {
@@ -426,7 +387,7 @@
               class="turtle-button {currentType === 'turtle'
                 ? 'selected-button'
                 : 'unselected-button'}"
-              on:click={() => filterShapes('turtle')}
+              on:click={() => ShapeSelectorDialog.filterShapes('turtle')}
               ><img
                 class="button-image-left"
                 src="turtle-icon.png"
@@ -437,7 +398,7 @@
               class="link-button {currentType === 'link'
                 ? 'selected-button'
                 : 'unselected-button'}"
-              on:click={() => filterShapes('link')}
+              on:click={() => ShapeSelectorDialog.filterShapes('link')}
               ><img
                 class="button-image-left"
                 src="link-icon.png"
@@ -446,14 +407,14 @@
             >
           </div>
           <div class="shape-selector-buttons">
-            <button class="create-new-button" on:click={createShape}
+            <button class="create-new-button" on:click={handleCreateShape}
               ><img
                 class="button-image-right"
                 src="create-new-icon.png"
                 alt="create new"
               />Create New</button
             >
-            <button class="import-shapes-button" on:click={importShapes}
+            <button class="import-shapes-button" on:click={ShapeSelectorDialog.importShapes}
               ><img
                 class="button-image-right"
                 src="import-icon.png"
@@ -469,45 +430,47 @@
       <div class="shape-selector-grid">
         <div class="shape-selector-grid-inner">
           {#each filteredShapes as shape (shape.id)}
-          <div class="shape-selector-item"
-          on:mouseenter={() => (shape.hover = true)}
-          on:mouseleave={() => (shape.hover = false)}
-          on:focus={() => (shape.hover = true)}
-          on:blur={() => (shape.hover = false)}>
-            <div class="shape-selector-item-buttons">
-              <button
-                on:click={() => duplicateShape(shape.id)}
-                on:keydown={(event) => {
-                  if (event.key === 'Enter') duplicateShape(shape.id);
-                }}
-                aria-label="Duplicate shape"
-                class="duplicate-icon"
-                style="display: {shape.hover ? 'block' : 'none'};"
-              ></button> <!-- Add closing tag for the button -->
-              <button
-                on:click={() => deleteShape(shape.id)}
-                on:keydown={(event) => {
-                  if (event.key === 'Enter') deleteShape(shape.id);
-                }}
-                aria-label="Delete shape"
-                class="delete-icon"
-                style="display: {shape.hover ? 'block' : 'none'};"
-              ></button> <!-- Add closing tag for the button -->
-            </div>
             <div
-              class="shape-selector-details"
+              class="shape-selector-item"
+              on:mouseenter={() => (shape.hover = true)}
+              on:mouseleave={() => (shape.hover = false)}
+              on:focus={() => (shape.hover = true)}
+              on:blur={() => (shape.hover = false)}
             >
-              <div class="shape-selector-item-image-div">
-                <img
-                  class="shape-selector-item-image"
-                  src={shape.image}
-                  alt=""
+              <div class="shape-selector-item-buttons">
+                <button
+                  on:click={() => ShapeSelectorDialog.duplicateShape(shape.id)}
+                  on:keydown={(event) => {
+                    if (event.key === 'Enter') ShapeSelectorDialog.duplicateShape(shape.id);
+                  }}
+                  aria-label="Duplicate shape"
+                  class="duplicate-icon"
+                  style="display: {shape.hover ? 'block' : 'none'};"
                 />
+                <!-- Add closing tag for the button -->
+                <button
+                  on:click={() => ShapeSelectorDialog.deleteShape(shape.id)}
+                  on:keydown={(event) => {
+                    if (event.key === 'Enter') ShapeSelectorDialog.deleteShape(shape.id);
+                  }}
+                  aria-label="Delete shape"
+                  class="delete-icon"
+                  style="display: {shape.hover ? 'block' : 'none'};"
+                />
+                <!-- Add closing tag for the button -->
               </div>
-              <div class="shape-selector-item-name">{shape.name}</div>
+              <div class="shape-selector-details">
+                <div class="shape-selector-item-image-div">
+                  <img
+                    class="shape-selector-item-image"
+                    src={shape.image}
+                    alt=""
+                  />
+                </div>
+                <div class="shape-selector-item-name">{shape.name}</div>
+              </div>
             </div>
-          </div>
-        {/each}        
+          {/each}
         </div>
       </div>
     </div>
