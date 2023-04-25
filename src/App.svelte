@@ -13,7 +13,14 @@
   let currentType = 'turtle';
 
   function createShape() {
-    // Code to create a new shape
+    const newShape = {
+      id: Math.max(...shapes.map((shape) => shape.id)) + 1,
+      name: 'new default',
+      image: 'down-arrow.png',
+      type: 'turtle',
+    };
+    shapes.unshift(newShape);
+    shapes = [...shapes];
   }
 
   function importShapes() {
@@ -148,6 +155,7 @@
     display: flex;
     align-items: center;
     padding-left: 0px;
+    cursor: pointer;
   }
   .shape-selector-dialog .selected-button {
     color: #ffffff;
@@ -179,6 +187,7 @@
     display: flex;
     align-items: center;
     padding-left: 0px;
+    cursor: pointer;
   }
   .shape-selector-dialog .button-image-left {
     width: 10px;
@@ -233,6 +242,7 @@
     align-items: center;
     color: #ffffff;
     text-shadow: 0px 2px 3px rgba(0, 0, 0, 0.25);
+    cursor: pointer;
   }
 
   .shape-selector-dialog .import-shapes-button {
@@ -253,6 +263,7 @@
 
     color: #ffffff;
     text-shadow: 0px 2px 3px rgba(0, 0, 0, 0.25);
+    cursor: pointer;
   }
 
   .shape-selector-dialog .shape-selector-buttons button {
