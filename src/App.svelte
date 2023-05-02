@@ -1,16 +1,40 @@
 <script>
   import { GalapagosShapeSelectorDialog } from './GalapagosShapeSelectorDialog.ts';
   import { onMount } from 'svelte';
+  import { writable } from 'svelte/store';
 
   let ShapeSelectorDialog;
-
-  onMount(() => {
-    ShapeSelectorDialog = new GalapagosShapeSelectorDialog(document.getElementById('Container'));
-  });
-
   let searchTerm;
   let currentType;
   let filteredShapes = [];
+  let shapes = [];
+
+  const shapesStore = writable([]);
+  const filteredShapesStore = writable([]);
+
+  onMount(() => {
+    const updateShapes = (newShapes) => {
+      shapesStore.set(newShapes);
+    };
+
+    const updateFilteredShapes = (newFilteredShapes) => {
+      filteredShapesStore.set(newFilteredShapes);
+    };
+
+    ShapeSelectorDialog = new GalapagosShapeSelectorDialog(
+      document.getElementById('Container'),
+      updateShapes,
+      updateFilteredShapes,
+    );
+  });
+
+  shapesStore.subscribe((value) => {
+    shapes = value;
+  });
+
+  filteredShapesStore.subscribe((value) => {
+    filteredShapes = value;
+  });
 
   // Update searchTerm, currentType, and filteredShapes when ShapeSelectorDialog changes
   $: {
@@ -18,6 +42,7 @@
       searchTerm = ShapeSelectorDialog.searchTerm;
       currentType = ShapeSelectorDialog.currentType;
       filteredShapes = ShapeSelectorDialog.filteredShapes;
+      shapes = ShapeSelectorDialog.shapes;
     }
   }
   const handleCreateShape = () => {
@@ -25,12 +50,11 @@
     ShapeSelectorDialog.createShape();
   };
 
-  const handleFilterShapes = (word) => {
-    ShapeSelectorDialog.filterShapes(word);
-  }
 
+  const handleDuplicateShape = (id) => {
+    ShapeSelectorDialog.duplicateShape(id);
+  };
 </script>
-
 
 <style>
   .shape-selector-dialog .shape-selector {
@@ -116,6 +140,11 @@
 
   .shape-selector-dialog .selected-button img {
     filter: invert(100%);
+  }
+
+  .shape-selector-dialog .button-disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 
   .shape-selector-dialog .unselected-button {
@@ -414,7 +443,9 @@
                 alt="create new"
               />Create New</button
             >
-            <button class="import-shapes-button" on:click={ShapeSelectorDialog.importShapes}
+            <button
+              class="import-shapes-button"
+              on:click={ShapeSelectorDialog.importShapes}
               ><img
                 class="button-image-right"
                 src="import-icon.png"
@@ -425,7 +456,12 @@
         </div>
       </div>
       <div class="shape-selector-search">
-        <input bind:value={searchTerm} placeholder="Search" />
+        <input
+          value={searchTerm}
+          on:input={(event) =>
+            ShapeSelectorDialog.handleSearch(event.target.value)}
+          placeholder="Search"
+        />
       </div>
       <div class="shape-selector-grid">
         <div class="shape-selector-grid-inner">
@@ -439,9 +475,9 @@
             >
               <div class="shape-selector-item-buttons">
                 <button
-                  on:click={() => ShapeSelectorDialog.duplicateShape(shape.id)}
+                  on:click={() => handleDuplicateShape(shape.id)}
                   on:keydown={(event) => {
-                    if (event.key === 'Enter') ShapeSelectorDialog.duplicateShape(shape.id);
+                    if (event.key === 'Enter') handleDuplicateShape(shape.id);
                   }}
                   aria-label="Duplicate shape"
                   class="duplicate-icon"
@@ -451,11 +487,13 @@
                 <button
                   on:click={() => ShapeSelectorDialog.deleteShape(shape.id)}
                   on:keydown={(event) => {
-                    if (event.key === 'Enter') ShapeSelectorDialog.deleteShape(shape.id);
+                    if (event.key === 'Enter')
+                      ShapeSelectorDialog.deleteShape(shape.id);
                   }}
                   aria-label="Delete shape"
-                  class="delete-icon"
+                  class="delete-icon {shape.deletable ? '' : 'button-disabled'}"
                   style="display: {shape.hover ? 'block' : 'none'};"
+                  disabled={!shape.deletable}
                 />
                 <!-- Add closing tag for the button -->
               </div>

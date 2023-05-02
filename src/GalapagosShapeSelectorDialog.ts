@@ -1,43 +1,49 @@
-export interface Shape {
-  id: number;
-  name: string;
-  image: string;
-  type: string;
-  hover?: boolean;
-}
+import { Shape } from './ShapeSelectorShape';
 
 export class GalapagosShapeSelectorDialog {
+
   parent: HTMLElement;
   shapes: Shape[] = [];
   searchTerm: string;
   filteredShapes: Shape[] = [];
   currentType: string;
+  onUpdate: (shapes: any[]) => void;
+  onUpdateFilteredShapes: (filteredShapes: any[]) => void;
+  
 
-  constructor(parent: HTMLElement) {
+  constructor(parent: HTMLElement, onUpdate: (shapes: any[]) => void, onUpdateFilteredShapes: (filteredShapes: any[]) => void) {
     this.parent = parent;
     this.shapes = [
-      { id: 1, name: 'default', image: 'down-arrow.png', type: 'turtle', hover: false},
-      { id: 2, name: 'apple', image: 'down-arrow.png', type: 'turtle', hover: false },
-      { id: 3, name: 'banana', image: 'down-arrow.png', type: 'turtle', hover: false },
-      { id: 4, name: 'peach', image: 'down-arrow.png', type: 'turtle' , hover: false},
-      { id: 5, name: 'down-arrow', image: 'down-arrow.png', type: 'link' , hover: false},
-      { id: 6, name: 'down-arrow', image: 'down-arrow.png', type: 'link', hover: false },
+      { id: 1, name: 'default', image: 'down-arrow.png', type: 'turtle', hover: false, deletable: false},
+      { id: 2, name: 'apple', image: 'down-arrow.png', type: 'turtle', hover: false, deletable: true },
+      { id: 3, name: 'banana', image: 'down-arrow.png', type: 'turtle', hover: false, deletable: true },
+      { id: 4, name: 'peach', image: 'down-arrow.png', type: 'turtle' , hover: false, deletable: true},
+      { id: 5, name: 'down-arrow', image: 'down-arrow.png', type: 'link' , hover: false, deletable: true},
+      { id: 6, name: 'down-arrow', image: 'down-arrow.png', type: 'link', hover: false , deletable: true},
     ];
     this.searchTerm = '';
     this.filteredShapes = this.shapes;
     this.currentType = 'turtle';
+    this.onUpdate = onUpdate;
+    this.onUpdateFilteredShapes = onUpdateFilteredShapes;
+
+    this.filterShapes(this.currentType);
   }
 
   createShape() {
-    console.log('create shape');
     const newShape: Shape = {
       id: Math.max(...this.shapes.map((shape) => shape.id)) + 1,
       name: 'new default',
       image: 'down-arrow.png',
       type: 'turtle',
+      hover: false,
+      deletable: true,
     };
     this.shapes.unshift(newShape);
     this.shapes = [...this.shapes];
+    this.onUpdate(this.shapes);
+    this.filterShapes(this.currentType);
+    this.onUpdateFilteredShapes(this.filteredShapes);
   }
 
   importShapes() {
@@ -46,7 +52,6 @@ export class GalapagosShapeSelectorDialog {
   }
 
   duplicateShape(id: number) {
-    console.log('duplicate shape')
     const shapeToDuplicate = this.shapes.find((shape) => shape.id === id);
     if (shapeToDuplicate) {
       const { name } = shapeToDuplicate;
@@ -88,18 +93,20 @@ export class GalapagosShapeSelectorDialog {
           ...shapeToDuplicate,
           name: newName,
           hover: false,
+          deletable: true,
         };
         const newId = Math.max(...this.shapes.map((shape) => shape.id)) + 1;
         duplicatedShape.id = newId;
         this.shapes.splice(newInsertIndex + 1, 0, duplicatedShape);
         this.shapes = [...this.shapes];
+        this.handleSearch(this.searchTerm);
+        this.onUpdate(this.shapes);
+        this.onUpdateFilteredShapes(this.filteredShapes);
       }
     }
   }
   
-
   deleteShape(id: number) {
-    console.log('delete shape')
     let shapeIndexToDelete = -1;
     for (let i = 0; i < this.shapes.length; i++) {
       if (this.shapes[i].id === id) {
@@ -111,11 +118,13 @@ export class GalapagosShapeSelectorDialog {
     if (shapeIndexToDelete !== -1) {
       this.shapes.splice(shapeIndexToDelete, 1);
       this.shapes = [...this.shapes];
+      this.handleSearch(this.searchTerm);
+      this.onUpdate(this.shapes);
+      this.onUpdateFilteredShapes(this.filteredShapes);
     }
   }
   
   filterShapes(type: string) {
-    console.log('filter shape')
     this.currentType = type;
     this.filteredShapes = [];
     for (let i = 0; i < this.shapes.length; i++) {
@@ -127,6 +136,14 @@ export class GalapagosShapeSelectorDialog {
         this.filteredShapes.push(shape);
       }
     }
+    this.onUpdateFilteredShapes(this.filteredShapes);
+  }
+
+  handleSearch(term: string) {
+    this.searchTerm = term;
+    this.filterShapes(this.currentType);
+    this.onUpdateFilteredShapes(this.filteredShapes);
   }
   
 }
+
