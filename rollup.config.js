@@ -5,6 +5,7 @@ import terser from '@rollup/plugin-terser';
 import resolve from '@rollup/plugin-node-resolve';
 import livereload from 'rollup-plugin-livereload';
 import css from 'rollup-plugin-css-only';
+import typescript from 'rollup-plugin-typescript2';
 
 const production = !process.env.ROLLUP_WATCH;
 
@@ -47,6 +48,11 @@ export default {
 		// we'll extract any component CSS out into
 		// a separate file - better for performance
 		css({ output: 'bundle.css' }),
+		typescript({
+			tsconfig: './tsconfig.json', 
+			target: 'es2015', 
+			lib: ['es2015', 'dom'], 
+		  }),
 
 		// If you have external dependencies installed from
 		// npm, you'll most likely need these plugins. In
