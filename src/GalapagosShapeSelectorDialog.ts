@@ -7,11 +7,14 @@ export class GalapagosShapeSelectorDialog {
   searchTerm: string;
   filteredShapes: Shape[] = [];
   currentType: string;
+  selectedItemId: number | null = null;
   onUpdate: (shapes: any[]) => void;
   onUpdateFilteredShapes: (filteredShapes: any[]) => void;
+  onUpdateSelectedItemId: (selectedItemId: number | null) => void;
   
 
-  constructor(parent: HTMLElement, onUpdate: (shapes: any[]) => void, onUpdateFilteredShapes: (filteredShapes: any[]) => void) {
+  constructor(parent: HTMLElement, onUpdate: (shapes: any[]) => void, onUpdateFilteredShapes: (filteredShapes: any[]) => void, onUpdateSelectedItemId: (selectedItemId: number | null) => void
+  ) {
     this.parent = parent;
     this.shapes = [
       { id: 1, name: 'default', image: 'down-arrow.png', type: 'turtle', hover: false, deletable: false},
@@ -26,7 +29,7 @@ export class GalapagosShapeSelectorDialog {
     this.currentType = 'turtle';
     this.onUpdate = onUpdate;
     this.onUpdateFilteredShapes = onUpdateFilteredShapes;
-
+    this.onUpdateSelectedItemId = onUpdateSelectedItemId;
     this.filterShapes(this.currentType);
   }
 
@@ -144,6 +147,17 @@ export class GalapagosShapeSelectorDialog {
     this.filterShapes(this.currentType);
     this.onUpdateFilteredShapes(this.filteredShapes);
   }
+
+  setSelectedItemId(id: number | null) {
+    if (this.selectedItemId === id) {
+      this.selectedItemId = null;
+    } else {
+      this.selectedItemId = id;
+    }
+    this.onUpdateSelectedItemId(this.selectedItemId);
+  }
+  
+
   
 }
 

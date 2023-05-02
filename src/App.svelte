@@ -8,9 +8,11 @@
   let currentType;
   let filteredShapes = [];
   let shapes = [];
+  let selectedItemId = null;
 
   const shapesStore = writable([]);
   const filteredShapesStore = writable([]);
+  const selectedItemIdStore = writable(null);
 
   onMount(() => {
     const updateShapes = (newShapes) => {
@@ -21,10 +23,15 @@
       filteredShapesStore.set(newFilteredShapes);
     };
 
+    const updateSelectedItemId = (newSelectedItemId) => {
+      selectedItemIdStore.set(newSelectedItemId);
+    };
+
     ShapeSelectorDialog = new GalapagosShapeSelectorDialog(
       document.getElementById('Container'),
       updateShapes,
       updateFilteredShapes,
+      updateSelectedItemId
     );
   });
 
@@ -36,6 +43,10 @@
     filteredShapes = value;
   });
 
+  selectedItemIdStore.subscribe((value) => {
+    selectedItemId = value;
+  });
+
   // Update searchTerm, currentType, and filteredShapes when ShapeSelectorDialog changes
   $: {
     if (ShapeSelectorDialog) {
@@ -43,13 +54,13 @@
       currentType = ShapeSelectorDialog.currentType;
       filteredShapes = ShapeSelectorDialog.filteredShapes;
       shapes = ShapeSelectorDialog.shapes;
+      selectedItemId = ShapeSelectorDialog.selectedItemId;
     }
   }
   const handleCreateShape = () => {
     // Call the createShape function on the shapeDialog instance
     ShapeSelectorDialog.createShape();
   };
-
 
   const handleDuplicateShape = (id) => {
     ShapeSelectorDialog.duplicateShape(id);
@@ -315,6 +326,23 @@
     border-radius: 3px;
   }
 
+  .shape-selector-dialog .selected {
+    background: #7D7D7D;
+    border: 0.7px solid #CECECE;
+    box-shadow: inset 0px 4px 4px rgba(0, 0, 0, 0.25);
+    color: #FFFFFF;
+  }
+
+  .shape-selector-dialog .font-selected {
+    color:white !important
+  }
+
+  .shape-selector-dialog .selected img {
+    filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%);
+  }
+
+
+
   .shape-selector-dialog .shape-selector-item-buttons {
     position: absolute;
     z-index: 1;
@@ -466,12 +494,13 @@
       <div class="shape-selector-grid">
         <div class="shape-selector-grid-inner">
           {#each filteredShapes as shape (shape.id)}
-            <div
-              class="shape-selector-item"
+            <button
+              class="shape-selector-item {shape.id === selectedItemId ? 'selected' : ''}"
               on:mouseenter={() => (shape.hover = true)}
               on:mouseleave={() => (shape.hover = false)}
               on:focus={() => (shape.hover = true)}
               on:blur={() => (shape.hover = false)}
+              on:click={() => ShapeSelectorDialog.setSelectedItemId(shape.id)}
             >
               <div class="shape-selector-item-buttons">
                 <button
@@ -483,7 +512,6 @@
                   class="duplicate-icon"
                   style="display: {shape.hover ? 'block' : 'none'};"
                 />
-                <!-- Add closing tag for the button -->
                 <button
                   on:click={() => ShapeSelectorDialog.deleteShape(shape.id)}
                   on:keydown={(event) => {
@@ -495,7 +523,6 @@
                   style="display: {shape.hover ? 'block' : 'none'};"
                   disabled={!shape.deletable}
                 />
-                <!-- Add closing tag for the button -->
               </div>
               <div class="shape-selector-details">
                 <div class="shape-selector-item-image-div">
@@ -505,9 +532,9 @@
                     alt=""
                   />
                 </div>
-                <div class="shape-selector-item-name">{shape.name}</div>
+                <div class="shape-selector-item-name {shape.id === selectedItemId ? 'font-selected' : ''}">{shape.name}</div>
               </div>
-            </div>
+            </button>
           {/each}
         </div>
       </div>
