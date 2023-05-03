@@ -1,5 +1,5 @@
 <script>
-  import { GalapagosShapeSelectorDialog } from './GalapagosShapeSelectorDialog.ts';
+  import { GalapagosShapeSelectorDialog } from './ShapeSelectorDialog.ts';
   import { onMount } from 'svelte';
   import { writable } from 'svelte/store';
 
@@ -10,31 +10,34 @@
   let shapes = [];
   let selectedItemId = null;
 
+  // Create writable stores for shapes, filteredShapes, and selectedItemId
   const shapesStore = writable([]);
   const filteredShapesStore = writable([]);
   const selectedItemIdStore = writable(null);
 
+  // Initialize ShapeSelectorDialog and set up update functions when the component is mounted
   onMount(() => {
-    const updateShapes = (newShapes) => {
-      shapesStore.set(newShapes);
+    // Initialize ShapeSelectorDialogConfig
+    const ShapeSelectorDialogConfig = {
+      onUpdateShapes: (newShapes) => {
+        shapesStore.set(newShapes);
+      },
+      onUpdateFilteredShapes: (newFilteredShapes) => {
+        filteredShapesStore.set(newFilteredShapes);
+      },
+      onUpdateSelectedItemId: (newSelectedItemId) => {
+        selectedItemIdStore.set(newSelectedItemId);
+      },
     };
 
-    const updateFilteredShapes = (newFilteredShapes) => {
-      filteredShapesStore.set(newFilteredShapes);
-    };
-
-    const updateSelectedItemId = (newSelectedItemId) => {
-      selectedItemIdStore.set(newSelectedItemId);
-    };
-
+    // Initialize ShapeSelectorDialog
     ShapeSelectorDialog = new GalapagosShapeSelectorDialog(
       document.getElementById('Container'),
-      updateShapes,
-      updateFilteredShapes,
-      updateSelectedItemId
+      ShapeSelectorDialogConfig,
     );
   });
 
+  // Subscribe to the stores
   shapesStore.subscribe((value) => {
     shapes = value;
   });
@@ -47,7 +50,7 @@
     selectedItemId = value;
   });
 
-  // Update searchTerm, currentType, and filteredShapes when ShapeSelectorDialog changes
+  // Update searchTerm, currentType, and filteredShapes, shapes, and selectedItemId when ShapeSelectorDialog changes
   $: {
     if (ShapeSelectorDialog) {
       searchTerm = ShapeSelectorDialog.searchTerm;
@@ -57,14 +60,6 @@
       selectedItemId = ShapeSelectorDialog.selectedItemId;
     }
   }
-  const handleCreateShape = () => {
-    // Call the createShape function on the shapeDialog instance
-    ShapeSelectorDialog.createShape();
-  };
-
-  const handleDuplicateShape = (id) => {
-    ShapeSelectorDialog.duplicateShape(id);
-  };
 </script>
 
 <style>
@@ -302,6 +297,7 @@
     margin-top: 14px;
     padding: 14px 14px 0px 14px;
   }
+  
   .shape-selector-dialog .shape-selector-grid-inner {
     overflow-y: auto;
     display: grid;
@@ -310,6 +306,7 @@
     width: 100%;
     height: 180px;
     box-sizing: border-box;
+    align-content: start;
   }
 
   .shape-selector-dialog .shape-selector-item {
@@ -327,21 +324,20 @@
   }
 
   .shape-selector-dialog .selected {
-    background: #7D7D7D;
-    border: 0.7px solid #CECECE;
+    background: #7d7d7d;
+    border: 0.7px solid #cecece;
     box-shadow: inset 0px 4px 4px rgba(0, 0, 0, 0.25);
-    color: #FFFFFF;
+    color: #ffffff;
   }
 
   .shape-selector-dialog .font-selected {
-    color:white !important
+    color: white !important;
   }
 
   .shape-selector-dialog .selected img {
-    filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%);
+    filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg)
+      brightness(100%) contrast(100%);
   }
-
-
 
   .shape-selector-dialog .shape-selector-item-buttons {
     position: absolute;
@@ -464,7 +460,9 @@
             >
           </div>
           <div class="shape-selector-buttons">
-            <button class="create-new-button" on:click={handleCreateShape}
+            <button
+              class="create-new-button"
+              on:click={ShapeSelectorDialog.createShape()}
               ><img
                 class="button-image-right"
                 src="create-new-icon.png"
@@ -495,7 +493,9 @@
         <div class="shape-selector-grid-inner">
           {#each filteredShapes as shape (shape.id)}
             <button
-              class="shape-selector-item {shape.id === selectedItemId ? 'selected' : ''}"
+              class="shape-selector-item {shape.id === selectedItemId
+                ? 'selected'
+                : ''}"
               on:mouseenter={() => (shape.hover = true)}
               on:mouseleave={() => (shape.hover = false)}
               on:focus={() => (shape.hover = true)}
@@ -504,19 +504,28 @@
             >
               <div class="shape-selector-item-buttons">
                 <button
-                  on:click={() => handleDuplicateShape(shape.id)}
+                  on:click={(event) => {
+                  event.stopPropagation();
+                  ShapeSelectorDialog.duplicateShape(shape.id)}}
                   on:keydown={(event) => {
-                    if (event.key === 'Enter') handleDuplicateShape(shape.id);
+                    if (event.key === 'Enter'){
+                    event.stopPropagation();
+                      ShapeSelectorDialog.duplicateShape(shape.id);}
                   }}
                   aria-label="Duplicate shape"
                   class="duplicate-icon"
                   style="display: {shape.hover ? 'block' : 'none'};"
                 />
                 <button
-                  on:click={() => ShapeSelectorDialog.deleteShape(shape.id)}
+                  on:click={(event) => {
+                    event.stopPropagation();
+                    ShapeSelectorDialog.deleteShape(shape.id)}}
                   on:keydown={(event) => {
-                    if (event.key === 'Enter')
+                    if (event.key === 'Enter'){
+                      event.stopPropagation();
                       ShapeSelectorDialog.deleteShape(shape.id);
+                    }
+                      
                   }}
                   aria-label="Delete shape"
                   class="delete-icon {shape.deletable ? '' : 'button-disabled'}"
@@ -532,7 +541,13 @@
                     alt=""
                   />
                 </div>
-                <div class="shape-selector-item-name {shape.id === selectedItemId ? 'font-selected' : ''}">{shape.name}</div>
+                <div
+                  class="shape-selector-item-name {shape.id === selectedItemId
+                    ? 'font-selected'
+                    : ''}"
+                >
+                  {shape.name}
+                </div>
               </div>
             </button>
           {/each}

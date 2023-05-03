@@ -1,20 +1,33 @@
 import { Shape } from './ShapeSelectorShape';
+import { GalapagosShapeSelectorDialogConfig } from './ShapeSelectorDialogConfig';
 
 export class GalapagosShapeSelectorDialog {
-
+  // Parent element where the dialog will be rendered
   parent: HTMLElement;
-  shapes: Shape[] = [];
-  searchTerm: string;
-  filteredShapes: Shape[] = [];
-  currentType: string;
-  selectedItemId: number | null = null;
-  onUpdate: (shapes: any[]) => void;
-  onUpdateFilteredShapes: (filteredShapes: any[]) => void;
-  onUpdateSelectedItemId: (selectedItemId: number | null) => void;
   
+  // Array of all shapes to display
+  shapes: Shape[] = [];
 
-  constructor(parent: HTMLElement, onUpdate: (shapes: any[]) => void, onUpdateFilteredShapes: (filteredShapes: any[]) => void, onUpdateSelectedItemId: (selectedItemId: number | null) => void
+  // The search term entered by the user
+  searchTerm: string;
+
+  // Array of shapes that match the current search term and type filter
+  filteredShapes: Shape[] = [];
+
+  // The current type filter applied to the shape list
+  currentType: string;
+
+  // The ID of the currently selected shape
+  selectedItemId: number | null = null;
+
+  // Config object containing callback functions to update the main app state
+  config: GalapagosShapeSelectorDialogConfig;
+
+  constructor(
+    parent: HTMLElement, 
+    config: GalapagosShapeSelectorDialogConfig
   ) {
+    // Initialize all fields
     this.parent = parent;
     this.shapes = [
       { id: 1, name: 'default', image: 'down-arrow.png', type: 'turtle', hover: false, deletable: false},
@@ -27,12 +40,11 @@ export class GalapagosShapeSelectorDialog {
     this.searchTerm = '';
     this.filteredShapes = this.shapes;
     this.currentType = 'turtle';
-    this.onUpdate = onUpdate;
-    this.onUpdateFilteredShapes = onUpdateFilteredShapes;
-    this.onUpdateSelectedItemId = onUpdateSelectedItemId;
+    this.config = config;
     this.filterShapes(this.currentType);
   }
 
+  // Create a new default shape object
   createShape() {
     const newShape: Shape = {
       id: Math.max(...this.shapes.map((shape) => shape.id)) + 1,
@@ -42,18 +54,21 @@ export class GalapagosShapeSelectorDialog {
       hover: false,
       deletable: true,
     };
+    // Add the new shape to the beginning of the shape array and update the filtered shape list
     this.shapes.unshift(newShape);
     this.shapes = [...this.shapes];
-    this.onUpdate(this.shapes);
+    this.config.onUpdateShapes(this.shapes);
     this.filterShapes(this.currentType);
-    this.onUpdateFilteredShapes(this.filteredShapes);
+    this.config.onUpdateFilteredShapes(this.filteredShapes);
   }
 
+  // functino to handle import shape button
   importShapes() {
     console.log('import shape')
     // Code to import shapes from a file
   }
 
+  // function to handle duplicate button click
   duplicateShape(id: number) {
     const shapeToDuplicate = this.shapes.find((shape) => shape.id === id);
     if (shapeToDuplicate) {
@@ -103,12 +118,13 @@ export class GalapagosShapeSelectorDialog {
         this.shapes.splice(newInsertIndex + 1, 0, duplicatedShape);
         this.shapes = [...this.shapes];
         this.handleSearch(this.searchTerm);
-        this.onUpdate(this.shapes);
-        this.onUpdateFilteredShapes(this.filteredShapes);
+        this.config.onUpdateShapes(this.shapes);
+        this.config.onUpdateFilteredShapes(this.filteredShapes);
       }
     }
   }
   
+  // function to handle delete button click
   deleteShape(id: number) {
     let shapeIndexToDelete = -1;
     for (let i = 0; i < this.shapes.length; i++) {
@@ -122,11 +138,12 @@ export class GalapagosShapeSelectorDialog {
       this.shapes.splice(shapeIndexToDelete, 1);
       this.shapes = [...this.shapes];
       this.handleSearch(this.searchTerm);
-      this.onUpdate(this.shapes);
-      this.onUpdateFilteredShapes(this.filteredShapes);
+      this.config.onUpdateShapes(this.shapes);
+      this.config.onUpdateFilteredShapes(this.filteredShapes);
     }
   }
   
+  // function to filter shapes when type filter changes
   filterShapes(type: string) {
     this.currentType = type;
     this.filteredShapes = [];
@@ -139,25 +156,24 @@ export class GalapagosShapeSelectorDialog {
         this.filteredShapes.push(shape);
       }
     }
-    this.onUpdateFilteredShapes(this.filteredShapes);
+    this.config.onUpdateFilteredShapes(this.filteredShapes);
   }
 
+  // function update shapes when search term changes
   handleSearch(term: string) {
     this.searchTerm = term;
     this.filterShapes(this.currentType);
-    this.onUpdateFilteredShapes(this.filteredShapes);
+    this.config.onUpdateFilteredShapes(this.filteredShapes);
   }
 
+  // function to handle shape selection
   setSelectedItemId(id: number | null) {
     if (this.selectedItemId === id) {
       this.selectedItemId = null;
     } else {
       this.selectedItemId = id;
     }
-    this.onUpdateSelectedItemId(this.selectedItemId);
+    this.config.onUpdateSelectedItemId(this.selectedItemId);
   }
-  
-
-  
 }
 
