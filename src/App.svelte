@@ -297,7 +297,7 @@
     margin-top: 14px;
     padding: 14px 14px 0px 14px;
   }
-  
+
   .shape-selector-dialog .shape-selector-grid-inner {
     overflow-y: auto;
     display: grid;
@@ -505,12 +505,14 @@
               <div class="shape-selector-item-buttons">
                 <button
                   on:click={(event) => {
-                  event.stopPropagation();
-                  ShapeSelectorDialog.duplicateShape(shape.id)}}
-                  on:keydown={(event) => {
-                    if (event.key === 'Enter'){
                     event.stopPropagation();
-                      ShapeSelectorDialog.duplicateShape(shape.id);}
+                    ShapeSelectorDialog.duplicateShape(shape.id);
+                  }}
+                  on:keydown={(event) => {
+                    if (event.key === 'Enter') {
+                      event.stopPropagation();
+                      ShapeSelectorDialog.duplicateShape(shape.id);
+                    }
                   }}
                   aria-label="Duplicate shape"
                   class="duplicate-icon"
@@ -519,13 +521,13 @@
                 <button
                   on:click={(event) => {
                     event.stopPropagation();
-                    ShapeSelectorDialog.deleteShape(shape.id)}}
+                    ShapeSelectorDialog.deleteShape(shape.id);
+                  }}
                   on:keydown={(event) => {
-                    if (event.key === 'Enter'){
+                    if (event.key === 'Enter') {
                       event.stopPropagation();
                       ShapeSelectorDialog.deleteShape(shape.id);
                     }
-                      
                   }}
                   aria-label="Delete shape"
                   class="delete-icon {shape.deletable ? '' : 'button-disabled'}"
