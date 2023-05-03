@@ -25,6 +25,10 @@ jobs:
         run: |
           npm ci
           npm run build
+      - name: Prepare for GitHub Pages deployment
+        run: |
+          mkdir -p public/Shape-Editor
+          cp -R build/* public/Shape-Editor/
       - name: Deploy to GitHub Pages
         if: github.ref == 'refs/heads/main'
         uses: peaceiris/actions-gh-pages@v3
