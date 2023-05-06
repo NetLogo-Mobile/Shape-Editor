@@ -6,4 +6,3 @@ export interface Shape {
     hover: boolean;
     deletable: boolean;
 }
-  
