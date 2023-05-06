@@ -24,6 +24,6 @@ module.exports = {
   },
   rules: {
     "css/no-duplicate-selectors": ["error", { "count": 1 }],
-    // Add more CSS rules here
+    "no-trailing-spaces": "error",
   }
 };
