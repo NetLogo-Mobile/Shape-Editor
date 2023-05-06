@@ -29,6 +29,7 @@ export class GalapagosShapeSelectorDialog {
   ) {
     // Initialize all fields
     this.parent = parent;
+    // shapes array is initialized with default shapes, should be imported from json in the future
     this.shapes = [
       { id: 1, name: 'default', image: '/shapes/down-arrow.png', type: 'turtle', hover: false, deletable: false},
       { id: 2, name: 'apple', image: '/shapes/down-arrow.png', type: 'turtle', hover: false, deletable: true },
