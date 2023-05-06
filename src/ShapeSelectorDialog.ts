@@ -30,12 +30,12 @@ export class GalapagosShapeSelectorDialog {
     // Initialize all fields
     this.parent = parent;
     this.shapes = [
-      { id: 1, name: 'default', image: 'down-arrow.png', type: 'turtle', hover: false, deletable: false},
-      { id: 2, name: 'apple', image: 'down-arrow.png', type: 'turtle', hover: false, deletable: true },
-      { id: 3, name: 'banana', image: 'down-arrow.png', type: 'turtle', hover: false, deletable: true },
-      { id: 4, name: 'peach', image: 'down-arrow.png', type: 'turtle' , hover: false, deletable: true},
-      { id: 5, name: 'down-arrow', image: 'down-arrow.png', type: 'link' , hover: false, deletable: true},
-      { id: 6, name: 'down-arrow', image: 'down-arrow.png', type: 'link', hover: false , deletable: true},
+      { id: 1, name: 'default', image: '/shapes/down-arrow.png', type: 'turtle', hover: false, deletable: false},
+      { id: 2, name: 'apple', image: '/shapes/down-arrow.png', type: 'turtle', hover: false, deletable: true },
+      { id: 3, name: 'banana', image: '/shapes/down-arrow.png', type: 'turtle', hover: false, deletable: true },
+      { id: 4, name: 'peach', image: '/shapes/down-arrow.png', type: 'turtle' , hover: false, deletable: true},
+      { id: 5, name: 'down-arrow', image: '/shapes/down-arrow.png', type: 'link' , hover: false, deletable: true},
+      { id: 6, name: 'down-arrow', image: '/shapes/down-arrow.png', type: 'link', hover: false , deletable: true},
     ];
     this.searchTerm = '';
     this.filteredShapes = this.shapes;
