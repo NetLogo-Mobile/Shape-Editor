@@ -31,12 +31,12 @@ export class GalapagosShapeSelectorDialog {
     this.parent = parent;
     // shapes array is initialized with default shapes, should be imported from json in the future
     this.shapes = [
-      { id: 1, name: 'default', image: '/shapes/down-arrow.png', type: 'turtle', hover: false, deletable: false},
-      { id: 2, name: 'apple', image: '/shapes/down-arrow.png', type: 'turtle', hover: false, deletable: true },
-      { id: 3, name: 'banana', image: '/shapes/down-arrow.png', type: 'turtle', hover: false, deletable: true },
-      { id: 4, name: 'peach', image: '/shapes/down-arrow.png', type: 'turtle' , hover: false, deletable: true},
-      { id: 5, name: 'down-arrow', image: '/shapes/down-arrow.png', type: 'link' , hover: false, deletable: true},
-      { id: 6, name: 'down-arrow', image: '/shapes/down-arrow.png', type: 'link', hover: false , deletable: true},
+      { id: 1, name: 'default', image: 'shapes/down-arrow.png', type: 'turtle', hover: false, deletable: false},
+      { id: 2, name: 'apple', image: 'shapes/down-arrow.png', type: 'turtle', hover: false, deletable: true },
+      { id: 3, name: 'banana', image: 'shapes/down-arrow.png', type: 'turtle', hover: false, deletable: true },
+      { id: 4, name: 'peach', image: 'shapes/down-arrow.png', type: 'turtle' , hover: false, deletable: true},
+      { id: 5, name: 'down-arrow', image: 'shapes/down-arrow.png', type: 'link' , hover: false, deletable: true},
+      { id: 6, name: 'down-arrow', image: 'shapes/down-arrow.png', type: 'link', hover: false , deletable: true},
     ];
     this.searchTerm = '';
     this.filteredShapes = this.shapes;
@@ -50,7 +50,7 @@ export class GalapagosShapeSelectorDialog {
     const newShape: Shape = {
       id: Math.max(...this.shapes.map((shape) => shape.id)) + 1,
       name: 'new default',
-      image: '/shapes/down-arrow.png',
+      image: 'shapes/down-arrow.png',
       type: 'turtle',
       hover: false,
       deletable: true,
