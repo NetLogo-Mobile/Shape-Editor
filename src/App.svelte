@@ -281,7 +281,6 @@
     align-items: center;
     color: #9e9e9e;
     border-radius: 5px;
-    background-image: url('icons/search-icon.png');
     background-repeat: no-repeat;
     background-position: left center;
     background-size: 10px;
@@ -359,7 +358,6 @@
     padding: 2.5px;
     margin-right: 1px;
     display: inline-block;
-    background-image: url('icons/duplicate-icon.png');
     background-repeat: no-repeat;
     background-position: center center;
     background-size: contain;
@@ -378,7 +376,6 @@
     padding: 2.5px;
     margin-right: 1px;
     display: inline-block;
-    background-image: url('icons/delete-icon.png');
     background-repeat: no-repeat;
     background-position: center center;
     background-size: contain;
@@ -487,6 +484,7 @@
           on:input={(event) =>
             ShapeSelectorDialog.handleSearch(event.target.value)}
           placeholder="Search"
+          style="background-image: url('icons/search-icon.png');"
         />
       </div>
       <div class="shape-selector-grid">
@@ -504,20 +502,24 @@
             >
               <div class="shape-selector-item-buttons">
                 <button
-                  on:click={(event) => {
-                    event.stopPropagation();
-                    ShapeSelectorDialog.duplicateShape(shape.id);
-                  }}
-                  on:keydown={(event) => {
-                    if (event.key === 'Enter') {
-                      event.stopPropagation();
-                      ShapeSelectorDialog.duplicateShape(shape.id);
-                    }
-                  }}
-                  aria-label="Duplicate shape"
-                  class="duplicate-icon"
-                  style="display: {shape.hover ? 'block' : 'none'};"
-                />
+  on:click={(event) => {
+    event.stopPropagation();
+    ShapeSelectorDialog.duplicateShape(shape.id);
+  }}
+  on:keydown={(event) => {
+    if (event.key === 'Enter') {
+      event.stopPropagation();
+      ShapeSelectorDialog.duplicateShape(shape.id);
+    }
+  }}
+  aria-label="Duplicate shape"
+  class="duplicate-icon"
+  style="
+    display: {shape.hover ? 'block' : 'none'};
+    background-image: url('icons/duplicate-icon.png');
+  "
+/>
+
                 <button
                   on:click={(event) => {
                     event.stopPropagation();
@@ -531,7 +533,8 @@
                   }}
                   aria-label="Delete shape"
                   class="delete-icon {shape.deletable ? '' : 'button-disabled'}"
-                  style="display: {shape.hover ? 'block' : 'none'};"
+                  style="display: {shape.hover ? 'block' : 'none'};
+                  background-image: url('icons/delete-icon.png');"
                   disabled={!shape.deletable}
                 />
               </div>
