@@ -281,7 +281,7 @@
     align-items: center;
     color: #9e9e9e;
     border-radius: 5px;
-    background-image: url('/icons/search-icon.png');
+    background-image: url('icons/search-icon.png');
     background-repeat: no-repeat;
     background-position: left center;
     background-size: 10px;
@@ -359,7 +359,7 @@
     padding: 2.5px;
     margin-right: 1px;
     display: inline-block;
-    background-image: url('/icons/duplicate-icon.png');
+    background-image: url('icons/duplicate-icon.png');
     background-repeat: no-repeat;
     background-position: center center;
     background-size: contain;
@@ -378,7 +378,7 @@
     padding: 2.5px;
     margin-right: 1px;
     display: inline-block;
-    background-image: url('/icons/delete-icon.png');
+    background-image: url('icons/delete-icon.png');
     background-repeat: no-repeat;
     background-position: center center;
     background-size: contain;
@@ -428,7 +428,7 @@
 <div class="shape-selector-dialog">
   <div class="shape-selector">
     <div class="shape-selector-header">
-      <img src="/icons/header-logo.png" alt="header logo" />
+      <img src="icons/header-logo.png" alt="header logo" />
       <h2>Shape Editor</h2>
     </div>
     <div class="inner-container">
@@ -443,7 +443,7 @@
               on:click={() => ShapeSelectorDialog.filterShapes('turtle')}
               ><img
                 class="button-image-left"
-                src="/icons/turtle-icon.png"
+                src="icons/turtle-icon.png"
                 alt="turtle button"
               />Turtle</button
             >
@@ -454,7 +454,7 @@
               on:click={() => ShapeSelectorDialog.filterShapes('link')}
               ><img
                 class="button-image-left"
-                src="/icons/link-icon.png"
+                src="icons/link-icon.png"
                 alt="link button"
               />Link</button
             >
@@ -465,7 +465,7 @@
               on:click={ShapeSelectorDialog.createShape()}
               ><img
                 class="button-image-right"
-                src="/icons/create-new-icon.png"
+                src="icons/create-new-icon.png"
                 alt="create new"
               />Create New</button
             >
@@ -474,7 +474,7 @@
               on:click={ShapeSelectorDialog.importShapes}
               ><img
                 class="button-image-right"
-                src="/icons/import-icon.png"
+                src="icons/import-icon.png"
                 alt="import"
               />Import From...</button
             >
