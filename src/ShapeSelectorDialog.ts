@@ -51,7 +51,7 @@ export class GalapagosShapeSelectorDialog {
       id: Math.max(...this.shapes.map((shape) => shape.id)) + 1,
       name: 'new default',
       image: 'shapes/down-arrow.png',
-      type: 'turtle',
+      type: this.currentType,
       hover: false,
       deletable: true,
     };
