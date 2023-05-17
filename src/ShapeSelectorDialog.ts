@@ -4,6 +4,9 @@ import { GalapagosShapeSelectorDialogConfig } from './ShapeSelectorDialogConfig'
 export class GalapagosShapeSelectorDialog {
   // Parent element where the dialog will be rendered
   parent: HTMLElement;
+
+  // dialog open state
+  dialogOpen: boolean;
   
   // Array of all shapes to display
   shapes: Shape[] = [];
@@ -43,6 +46,12 @@ export class GalapagosShapeSelectorDialog {
     this.currentType = 'turtle';
     this.config = config;
     this.filterShapes(this.currentType);
+    this.dialogOpen = true;
+  }
+
+  // function to open and close the dialog
+  toggleDialog() {
+    this.config.onUpdateDialogOpen(!this.dialogOpen);
   }
 
   // Create a new default shape object
@@ -174,6 +183,8 @@ export class GalapagosShapeSelectorDialog {
     } else {
       this.selectedItemId = id;
     }
+    // console log this information in selected shape
+    console.log(this.shapes.find((shape) => shape.id === this.selectedItemId));
     this.config.onUpdateSelectedItemId(this.selectedItemId);
   }
 }
