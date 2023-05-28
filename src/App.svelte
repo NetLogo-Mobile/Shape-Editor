@@ -1,5 +1,6 @@
 <script>
   import { GalapagosShapeSelectorDialog } from './ShapeSelectorDialog.ts';
+  import LibraryDialog from './LibraryDialog.svelte';
   import { onMount } from 'svelte';
   import { writable } from 'svelte/store';
 
@@ -11,7 +12,7 @@
   let selectedItemId = null;
   let dialogOpen = true;
   let importButtonSelected = false;
-  // let libraryOpen = false;
+  let libraryOpen = false;
 
   // Create writable stores for shapes, filteredShapes, and selectedItemId
   const shapesStore = writable([]);
@@ -19,6 +20,7 @@
   const selectedItemIdStore = writable(null);
   const dialogOpenStore = writable(true);
   const importButtonSelectedStore = writable(false);
+  const libraryOpenStore = writable(false);
 
   // Initialize ShapeSelectorDialog and set up update functions when the component is mounted
   onMount(() => {
@@ -38,6 +40,9 @@
       },
       onUpdateImportButtonSelected: (newImportButtonSelected) => {
         importButtonSelectedStore.set(newImportButtonSelected);
+      },
+      onUpdateLibraryOpen: (newLibraryOpen) => {
+        libraryOpenStore.set(newLibraryOpen);
       },
     };
 
@@ -69,6 +74,10 @@
     importButtonSelected = value;
   });
 
+  libraryOpenStore.subscribe((value) => {
+    libraryOpen = value;
+  });
+
   $: {
     if (ShapeSelectorDialog) {
       searchTerm = ShapeSelectorDialog.searchTerm;
@@ -78,6 +87,7 @@
       selectedItemId = ShapeSelectorDialog.selectedItemId;
       dialogOpen = ShapeSelectorDialog.dialogOpen;
       importButtonSelected = ShapeSelectorDialog.importButtonSelected;
+      libraryOpen = ShapeSelectorDialog.libraryOpen;
     }
   }
 </script>
@@ -317,8 +327,8 @@
     display: flex; /* Change to flex */
     flex-direction: column; /* Stack content vertically */
     position: absolute;
-    left: 10%; /* To center the dropdown menu */
-    width: 80%; /* Width of the dropdown menu */
+    left: 3%; /* To center the dropdown menu */
+    width: 94%; /* Width of the dropdown menu */
     box-sizing: border-box;
     border: none;
     border-radius: 2px;
@@ -531,6 +541,9 @@
   class="shape-selector-dialog"
   style="display: {dialogOpen ? 'block' : 'none'}"
 >
+  {#if libraryOpen}
+    <LibraryDialog />
+  {/if}
   <div class="shape-selector">
     <div class="shape-selector-header">
       <div class="shape-selector-header-logo">
@@ -604,7 +617,7 @@
                 <div class="dropdown-content">
                   <button
                     class="dropdown-button library-button"
-                    on:click={console.log('todo')}
+                    on:click={ShapeSelectorDialog.toggleLibrary()}
                     ><img
                       class="button-image-left"
                       src="icons/library-icon.png"
@@ -613,7 +626,7 @@
                   >
                   <button
                     class="dropdown-button model-button"
-                    on:click={ShapeSelectorDialog.openModelDialog()}
+                    on:click={console.log('model')}
                     ><img
                       class="button-image-left"
                       src="icons/model-icon.png"

@@ -1,7 +1,7 @@
 import { Shape } from './ShapeSelectorShape';
-import { GalapagosShapeSelectorDialogConfig } from './ShapeSelectorDialogConfig';
+import { GalapagosShapeSelectorLibraryConfig } from './ShapeSelectorLibraryConfig';
 
-export class GalapagosShapeSelectorDialog {
+export class GalapagosShapeSelectorLibrary {
   // Parent element where the dialog will be rendered
   parent: HTMLElement;
 
@@ -24,17 +24,11 @@ export class GalapagosShapeSelectorDialog {
   selectedItemId: number | null = null;
 
   // Config object containing callback functions to update the main app state
-  config: GalapagosShapeSelectorDialogConfig;
-
-  // Boolean to track if the import button has been selected
-  importButtonSelected: boolean;
-
-  // Boolean to track if the library has been opened
-  libraryOpen: boolean;
+  config: GalapagosShapeSelectorLibraryConfig;
 
   constructor(
     parent: HTMLElement, 
-    config: GalapagosShapeSelectorDialogConfig
+    config: GalapagosShapeSelectorLibraryConfig
   ) {
     // Initialize all fields
     this.parent = parent;
@@ -53,19 +47,12 @@ export class GalapagosShapeSelectorDialog {
     this.config = config;
     this.filterShapes(this.currentType);
     this.dialogOpen = true;
-    this.importButtonSelected = false;
-    this.libraryOpen = false;
   }
 
   // function to open and close the dialog
   toggleDialog() {
     this.dialogOpen = !this.dialogOpen;
     this.config.onUpdateDialogOpen(this.dialogOpen);
-  }
-
-  toggleLibrary() {
-    this.libraryOpen = !this.libraryOpen;
-    this.config.onUpdateLibraryOpen(this.libraryOpen);
   }
 
   // Create a new default shape object
@@ -84,12 +71,6 @@ export class GalapagosShapeSelectorDialog {
     this.config.onUpdateShapes(this.shapes);
     this.filterShapes(this.currentType);
     this.config.onUpdateFilteredShapes(this.filteredShapes);
-  }
-
-  // functino to handle import shape button
-  importShapes() {
-    this.importButtonSelected = !this.importButtonSelected;
-    this.config.onUpdateImportButtonSelected(this.importButtonSelected);
   }
 
   // function to handle duplicate button click
