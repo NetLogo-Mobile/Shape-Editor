@@ -40,6 +40,12 @@ export class GalapagosShapeSelectorLibrary {
       { id: 4, name: 'peach', image: 'shapes/down-arrow.png', type: 'turtle' , hover: false, deletable: true},
       { id: 5, name: 'down-arrow', image: 'shapes/down-arrow.png', type: 'link' , hover: false, deletable: true},
       { id: 6, name: 'down-arrow', image: 'shapes/down-arrow.png', type: 'link', hover: false , deletable: true},
+      { id: 7, name: 'default', image: 'shapes/down-arrow.png', type: 'turtle', hover: false, deletable: false},
+      { id: 8, name: 'apple', image: 'shapes/down-arrow.png', type: 'turtle', hover: false, deletable: true },
+      { id: 9, name: 'banana', image: 'shapes/down-arrow.png', type: 'turtle', hover: false, deletable: true },
+      { id: 10, name: 'peach', image: 'shapes/down-arrow.png', type: 'turtle' , hover: false, deletable: true},
+      { id: 11, name: 'down-arrow', image: 'shapes/down-arrow.png', type: 'link' , hover: false, deletable: true},
+      { id: 12, name: 'down-arrow', image: 'shapes/down-arrow.png', type: 'link', hover: false , deletable: true},
     ];
     this.searchTerm = '';
     this.filteredShapes = this.shapes;
@@ -47,12 +53,6 @@ export class GalapagosShapeSelectorLibrary {
     this.config = config;
     this.filterShapes(this.currentType);
     this.dialogOpen = true;
-  }
-
-  // function to open and close the dialog
-  toggleDialog() {
-    this.dialogOpen = !this.dialogOpen;
-    this.config.onUpdateDialogOpen(this.dialogOpen);
   }
 
   // Create a new default shape object

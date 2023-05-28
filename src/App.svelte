@@ -4,6 +4,10 @@
   import { onMount } from 'svelte';
   import { writable } from 'svelte/store';
 
+// your other TypeScript code...
+
+  let dialog;
+  let header;
   let ShapeSelectorDialog;
   let searchTerm;
   let currentType;
@@ -13,6 +17,7 @@
   let dialogOpen = true;
   let importButtonSelected = false;
   let libraryOpen = false;
+  let closeLibrary;
 
   // Create writable stores for shapes, filteredShapes, and selectedItemId
   const shapesStore = writable([]);
@@ -51,6 +56,33 @@
       document.getElementById('Container'),
       ShapeSelectorDialogConfig,
     );
+
+    let isDown = false;
+    let offset = [0, 0];
+
+    closeLibrary = () => {
+      ShapeSelectorDialog.closeLibrary();
+    }
+
+    header.addEventListener('mousedown', (event) => {
+      isDown = true;
+      offset = [
+        dialog.offsetLeft - event.clientX,
+        dialog.offsetTop - event.clientY
+      ];
+    }, true);
+
+    document.addEventListener('mouseup', () => {
+      isDown = false;
+    }, true);
+
+    document.addEventListener('mousemove', (event) => {
+      event.preventDefault();
+      if (isDown) {
+        dialog.style.left = (event.clientX + offset[0]) + 'px';
+        dialog.style.top  = (event.clientY + offset[1]) + 'px';
+      }
+    }, true);
   });
 
   // Subscribe to the stores
@@ -95,15 +127,18 @@
 <style>
   .shape-selector-dialog {
     font-family: 'Lato';
+    position: absolute;
   }
 
   .shape-selector-dialog .shape-selector {
     box-sizing: border-box;
-    position: absolute;
+    /* position: absolute; */
     width: 31.25rem; /* 500px/16 */
     height: 22.625rem; /* 362px/16 */
-    left: 12.5rem; /* 200px/16 */
-    top: 7.09375rem; /* 113.5px/16 */
+
+    /* left: 12.5rem; 
+    top: 7.09375rem;  */
+    
     background: #eeeff0;
     border: 0.0625rem solid #c0c0c0; /* 1px/16 */
     box-shadow: 0 0.25rem 0.25rem rgba(0, 0, 0, 0.25); /* 4px/16 */
@@ -537,15 +572,18 @@
   }
 </style>
 
+
+<div>
+  {#if libraryOpen}
+  <LibraryDialog {closeLibrary}/>
+{/if}
 <div
   class="shape-selector-dialog"
-  style="display: {dialogOpen ? 'block' : 'none'}"
+  bind:this={dialog}
+  style="display: {dialogOpen ? 'block' : 'none'} !important;"
 >
-  {#if libraryOpen}
-    <LibraryDialog />
-  {/if}
   <div class="shape-selector">
-    <div class="shape-selector-header">
+    <div class="shape-selector-header" bind:this={header}>
       <div class="shape-selector-header-logo">
         <img src="icons/header-logo.png" alt="header logo" />
         <h2>Shape Editor</h2>
@@ -617,7 +655,7 @@
                 <div class="dropdown-content">
                   <button
                     class="dropdown-button library-button"
-                    on:click={ShapeSelectorDialog.toggleLibrary()}
+                    on:click={ShapeSelectorDialog.openLibrary() }
                     ><img
                       class="button-image-left"
                       src="icons/library-icon.png"
@@ -722,3 +760,5 @@
     </div>
   </div>
 </div>
+</div>
+

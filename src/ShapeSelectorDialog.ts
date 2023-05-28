@@ -63,8 +63,18 @@ export class GalapagosShapeSelectorDialog {
     this.config.onUpdateDialogOpen(this.dialogOpen);
   }
 
-  toggleLibrary() {
-    this.libraryOpen = !this.libraryOpen;
+  // function to open the library
+  openLibrary() {
+    this.libraryOpen = true;
+    this.importButtonSelected = false;
+    this.config.onUpdateLibraryOpen(this.libraryOpen);
+    this.config.onUpdateImportButtonSelected(this.importButtonSelected);
+  }
+
+  // 
+  closeLibrary() {
+    console.log('close library')
+    this.libraryOpen = false;
     this.config.onUpdateLibraryOpen(this.libraryOpen);
   }
 
