@@ -158,6 +158,45 @@ export class GalapagosShapeSelectorDialog {
     }
   }
   
+  // function to handle adding a shape
+  addNewShape(shape: Shape) {
+    // make the shape the next available id and set the type to the current type
+    shape.id = Math.max(...this.shapes.map((shape) => shape.id)) + 1;
+    shape.type = this.currentType;
+    shape.hover = false;
+    shape.deletable = true;
+
+    // if the name is default, insert at the beginning
+    if (shape.name === 'default') {
+      shape.deletable = false;
+      this.shapes.unshift(shape);
+      this.shapes = [...this.shapes];
+      this.config.onUpdateShapes(this.shapes);
+      this.filterShapes(this.currentType);
+      this.selectedItemId = shape.id;
+      this.config.onUpdateSelectedItemId(this.selectedItemId);
+      return;
+    }
+    // insert shape by alphabetical order after the defaults
+    let insertIndex = -1;
+    for (let i = 0; i < this.shapes.length; i++) {
+      if (this.shapes[i].name != 'default' && this.shapes[i].name > shape.name) {
+        insertIndex = i;
+        break;
+      }
+    }
+
+    if (insertIndex === -1) {
+      insertIndex = this.shapes.length;
+    }
+    this.shapes.splice(insertIndex, 0, shape);
+    this.shapes = [...this.shapes];
+    this.config.onUpdateShapes(this.shapes);
+    this.selectedItemId = shape.id;
+    this.config.onUpdateSelectedItemId(this.selectedItemId);
+    this.filterShapes(this.currentType);
+  }
+
   // function to handle delete button click
   deleteShape(id: number) {
     let shapeIndexToDelete = -1;

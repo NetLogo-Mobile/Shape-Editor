@@ -39,13 +39,6 @@ export class GalapagosShapeSelectorLibrary {
       { id: 3, name: 'banana', image: 'shapes/down-arrow.png', type: 'turtle', hover: false, deletable: true },
       { id: 4, name: 'peach', image: 'shapes/down-arrow.png', type: 'turtle' , hover: false, deletable: true},
       { id: 5, name: 'down-arrow', image: 'shapes/down-arrow.png', type: 'link' , hover: false, deletable: true},
-      { id: 6, name: 'down-arrow', image: 'shapes/down-arrow.png', type: 'link', hover: false , deletable: true},
-      { id: 7, name: 'default', image: 'shapes/down-arrow.png', type: 'turtle', hover: false, deletable: false},
-      { id: 8, name: 'apple', image: 'shapes/down-arrow.png', type: 'turtle', hover: false, deletable: true },
-      { id: 9, name: 'banana', image: 'shapes/down-arrow.png', type: 'turtle', hover: false, deletable: true },
-      { id: 10, name: 'peach', image: 'shapes/down-arrow.png', type: 'turtle' , hover: false, deletable: true},
-      { id: 11, name: 'down-arrow', image: 'shapes/down-arrow.png', type: 'link' , hover: false, deletable: true},
-      { id: 12, name: 'down-arrow', image: 'shapes/down-arrow.png', type: 'link', hover: false , deletable: true},
     ];
     this.searchTerm = '';
     this.filteredShapes = this.shapes;
@@ -53,99 +46,6 @@ export class GalapagosShapeSelectorLibrary {
     this.config = config;
     this.filterShapes(this.currentType);
     this.dialogOpen = true;
-  }
-
-  // Create a new default shape object
-  createShape() {
-    const newShape: Shape = {
-      id: Math.max(...this.shapes.map((shape) => shape.id)) + 1,
-      name: 'new default',
-      image: 'shapes/down-arrow.png',
-      type: this.currentType,
-      hover: false,
-      deletable: true,
-    };
-    // Add the new shape to the beginning of the shape array and update the filtered shape list
-    this.shapes.unshift(newShape);
-    this.shapes = [...this.shapes];
-    this.config.onUpdateShapes(this.shapes);
-    this.filterShapes(this.currentType);
-    this.config.onUpdateFilteredShapes(this.filteredShapes);
-  }
-
-  // function to handle duplicate button click
-  duplicateShape(id: number) {
-    const shapeToDuplicate = this.shapes.find((shape) => shape.id === id);
-    if (shapeToDuplicate) {
-      const { name } = shapeToDuplicate;
-      const nameMatch = name.match(/^(.*?)(\s(\d+))?$/);
-      if (nameMatch) {
-        const baseName = nameMatch[1];
-        const existingIndices: number[] = [];
-        for (const shape of this.shapes) {
-          if (shape.name.indexOf(baseName) === 0) {
-            const indexMatch = shape.name.match(/^.*\s(\d+)$/);
-            if (indexMatch) {
-              existingIndices.push(Number(indexMatch[1]));
-            }
-          }
-        }
-        let insertIndex = -1;
-        for (let i = 0; i < this.shapes.length; i++) {
-          if (this.shapes[i].id === id) {
-            insertIndex = i;
-            break;
-          }
-        }
-        let newInsertIndex = insertIndex;
-        if (existingIndices.length >= 1) {
-          let maxIndex = Math.max(...existingIndices);
-          for (let i = 0; i < this.shapes.length; i++) {
-            if (
-              this.shapes[i].name ===
-              `${baseName} ${maxIndex}`
-            ) {
-              newInsertIndex = i;
-              break;
-            }
-          }
-        }
-        const newIndex = existingIndices.length ? Math.max(...existingIndices) + 1 : 1;
-        const newName = `${baseName} ${newIndex}`;
-        const duplicatedShape = {
-          ...shapeToDuplicate,
-          name: newName,
-          hover: false,
-          deletable: true,
-        };
-        const newId = Math.max(...this.shapes.map((shape) => shape.id)) + 1;
-        duplicatedShape.id = newId;
-        this.shapes.splice(newInsertIndex + 1, 0, duplicatedShape);
-        this.shapes = [...this.shapes];
-        this.handleSearch(this.searchTerm);
-        this.config.onUpdateShapes(this.shapes);
-        this.config.onUpdateFilteredShapes(this.filteredShapes);
-      }
-    }
-  }
-  
-  // function to handle delete button click
-  deleteShape(id: number) {
-    let shapeIndexToDelete = -1;
-    for (let i = 0; i < this.shapes.length; i++) {
-      if (this.shapes[i].id === id) {
-        shapeIndexToDelete = i;
-        break;
-      }
-    }
-  
-    if (shapeIndexToDelete !== -1) {
-      this.shapes.splice(shapeIndexToDelete, 1);
-      this.shapes = [...this.shapes];
-      this.handleSearch(this.searchTerm);
-      this.config.onUpdateShapes(this.shapes);
-      this.config.onUpdateFilteredShapes(this.filteredShapes);
-    }
   }
   
   // function to filter shapes when type filter changes
@@ -182,5 +82,6 @@ export class GalapagosShapeSelectorLibrary {
     console.log(this.shapes.find((shape) => shape.id === this.selectedItemId));
     this.config.onUpdateSelectedItemId(this.selectedItemId);
   }
+
 }
 

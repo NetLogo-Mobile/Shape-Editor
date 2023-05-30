@@ -3,8 +3,9 @@
   import LibraryDialog from './LibraryDialog.svelte';
   import { onMount } from 'svelte';
   import { writable } from 'svelte/store';
+  import { fade } from 'svelte/transition';
 
-// your other TypeScript code...
+  // your other TypeScript code...
 
   let dialog;
   let header;
@@ -18,6 +19,7 @@
   let importButtonSelected = false;
   let libraryOpen = false;
   let closeLibrary;
+  let addNewShape;
 
   // Create writable stores for shapes, filteredShapes, and selectedItemId
   const shapesStore = writable([]);
@@ -62,27 +64,43 @@
 
     closeLibrary = () => {
       ShapeSelectorDialog.closeLibrary();
-    }
+    };
 
-    header.addEventListener('mousedown', (event) => {
-      isDown = true;
-      offset = [
-        dialog.offsetLeft - event.clientX,
-        dialog.offsetTop - event.clientY
-      ];
-    }, true);
+    addNewShape = (shape) => {
+      ShapeSelectorDialog.addNewShape(shape);
+    };
 
-    document.addEventListener('mouseup', () => {
-      isDown = false;
-    }, true);
+    header.addEventListener(
+      'mousedown',
+      (event) => {
+        isDown = true;
+        offset = [
+          dialog.offsetLeft - event.clientX,
+          dialog.offsetTop - event.clientY,
+        ];
+      },
+      true,
+    );
 
-    document.addEventListener('mousemove', (event) => {
-      event.preventDefault();
-      if (isDown) {
-        dialog.style.left = (event.clientX + offset[0]) + 'px';
-        dialog.style.top  = (event.clientY + offset[1]) + 'px';
-      }
-    }, true);
+    document.addEventListener(
+      'mouseup',
+      () => {
+        isDown = false;
+      },
+      true,
+    );
+
+    document.addEventListener(
+      'mousemove',
+      (event) => {
+        event.preventDefault();
+        if (isDown) {
+          dialog.style.left = event.clientX + offset[0] + 'px';
+          dialog.style.top = event.clientY + offset[1] + 'px';
+        }
+      },
+      true,
+    );
   });
 
   // Subscribe to the stores
@@ -138,7 +156,7 @@
 
     /* left: 12.5rem; 
     top: 7.09375rem;  */
-    
+
     background: #eeeff0;
     border: 0.0625rem solid #c0c0c0; /* 1px/16 */
     box-shadow: 0 0.25rem 0.25rem rgba(0, 0, 0, 0.25); /* 4px/16 */
@@ -572,193 +590,194 @@
   }
 </style>
 
-
 <div>
   {#if libraryOpen}
-  <LibraryDialog {closeLibrary}/>
-{/if}
-<div
-  class="shape-selector-dialog"
-  bind:this={dialog}
-  style="display: {dialogOpen ? 'block' : 'none'} !important;"
->
-  <div class="shape-selector">
-    <div class="shape-selector-header" bind:this={header}>
-      <div class="shape-selector-header-logo">
-        <img src="icons/header-logo.png" alt="header logo" />
-        <h2>Shape Editor</h2>
+    <LibraryDialog {closeLibrary} {addNewShape}/>
+  {/if}
+  <div
+    class="shape-selector-dialog"
+    bind:this={dialog}
+    style="display: {dialogOpen ? 'block' : 'none'} !important;"
+  >
+    <div class="shape-selector">
+      <div class="shape-selector-header" bind:this={header}>
+        <div class="shape-selector-header-logo">
+          <img src="icons/header-logo.png" alt="header logo" />
+          <h2>Shape Editor</h2>
+        </div>
+        <button
+          class="close-button"
+          on:click={() => ShapeSelectorDialog.toggleDialog()}
+        >
+          <img src="icons/close-button.png" alt="X" />
+        </button>
       </div>
-      <button
-        class="close-button"
-        on:click={() => ShapeSelectorDialog.toggleDialog()}
-      >
-        <img src="icons/close-button.png" alt="X" />
-      </button>
-    </div>
-    <div class="inner-container">
-      <div class="mode-selector">
-        <h3>Selection Mode</h3>
-        <div class="selector-buttons">
-          <div class="mode-selector-buttons">
-            <button
-              class="turtle-button {currentType === 'turtle'
-                ? 'selected-button'
-                : 'unselected-button'}"
-              on:click={() => {
-                currentType = 'turtle';
-                ShapeSelectorDialog.filterShapes('turtle');
-              }}
-              ><img
-                class="button-image-left"
-                src="icons/turtle-icon.png"
-                alt="turtle button"
-              />Turtle</button
-            >
-            <button
-              class="link-button {currentType === 'link'
-                ? 'selected-button'
-                : 'unselected-button'}"
-              on:click={() => {
-                currentType = 'link';
-                ShapeSelectorDialog.filterShapes('link');
-              }}
-              ><img
-                class="button-image-left"
-                src="icons/link-icon.png"
-                alt="link button"
-              />Link</button
-            >
-          </div>
-          <div class="shape-selector-buttons">
-            <button
-              class="create-new-button"
-              on:click={ShapeSelectorDialog.createShape()}
-              ><img
-                class="button-image-right"
-                src="icons/create-new-icon.png"
-                alt="create new"
-              />Create New</button
-            >
-            <div class="dropdown">
+      <div class="inner-container">
+        <div class="mode-selector">
+          <h3>Selection Mode</h3>
+          <div class="selector-buttons">
+            <div class="mode-selector-buttons">
               <button
-                class="import-shapes-button {importButtonSelected
-                  ? 'clicked'
-                  : ''}"
-                on:click={ShapeSelectorDialog.importShapes()}
+                class="turtle-button {currentType === 'turtle'
+                  ? 'selected-button'
+                  : 'unselected-button'}"
+                on:click={() => {
+                  currentType = 'turtle';
+                  ShapeSelectorDialog.filterShapes('turtle');
+                }}
+                ><img
+                  class="button-image-left"
+                  src="icons/turtle-icon.png"
+                  alt="turtle button"
+                />Turtle</button
+              >
+              <button
+                class="link-button {currentType === 'link'
+                  ? 'selected-button'
+                  : 'unselected-button'}"
+                on:click={() => {
+                  currentType = 'link';
+                  ShapeSelectorDialog.filterShapes('link');
+                }}
+                ><img
+                  class="button-image-left"
+                  src="icons/link-icon.png"
+                  alt="link button"
+                />Link</button
+              >
+            </div>
+            <div class="shape-selector-buttons">
+              <button
+                class="create-new-button"
+                on:click={ShapeSelectorDialog.createShape()}
                 ><img
                   class="button-image-right"
-                  src="icons/import-icon.png"
-                  alt="import"
-                />Import From...</button
+                  src="icons/create-new-icon.png"
+                  alt="create new"
+                />Create New</button
               >
-              {#if importButtonSelected}
-                <div class="dropdown-content">
-                  <button
-                    class="dropdown-button library-button"
-                    on:click={ShapeSelectorDialog.openLibrary() }
-                    ><img
-                      class="button-image-left"
-                      src="icons/library-icon.png"
-                      alt="library"
-                    />Library</button
-                  >
-                  <button
-                    class="dropdown-button model-button"
-                    on:click={console.log('model')}
-                    ><img
-                      class="button-image-left"
-                      src="icons/model-icon.png"
-                      alt="model"
-                    />Model</button
-                  >
-                </div>
-              {/if}
+              <div class="dropdown">
+                <button
+                  class="import-shapes-button {importButtonSelected
+                    ? 'clicked'
+                    : ''}"
+                  on:click={ShapeSelectorDialog.importShapes()}
+                  ><img
+                    class="button-image-right"
+                    src="icons/import-icon.png"
+                    alt="import"
+                  />Import From...</button
+                >
+                {#if importButtonSelected}
+                  <div class="dropdown-content" transition:fade={{ duration: 500 }}>
+                    <button
+                      class="dropdown-button library-button"
+                      on:click={ShapeSelectorDialog.openLibrary()}
+                      ><img
+                        class="button-image-left"
+                        src="icons/library-icon.png"
+                        alt="library"
+                      />Library</button
+                    >
+                    <button
+                      class="dropdown-button model-button"
+                      on:click={console.log('model')}
+                      ><img
+                        class="button-image-left"
+                        src="icons/model-icon.png"
+                        alt="model"
+                      />Model</button
+                    >
+                  </div>
+                {/if}
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <div class="shape-selector-search">
-        <input
-          value={searchTerm}
-          on:input={(event) =>
-            ShapeSelectorDialog.handleSearch(event.target.value)}
-          placeholder="Search"
-          style="background-image: url('icons/search-icon.png');"
-        />
-      </div>
-      <div class="shape-selector-grid">
-        <div class="shape-selector-grid-inner">
-          {#each filteredShapes as shape (shape.id)}
-            <button
-              class="shape-selector-item {shape.id === selectedItemId
-                ? 'selected'
-                : ''}"
-              on:mouseenter={() => (shape.hover = true)}
-              on:mouseleave={() => (shape.hover = false)}
-              on:focus={() => (shape.hover = true)}
-              on:blur={() => (shape.hover = false)}
-              on:click={() => ShapeSelectorDialog.setSelectedItemId(shape.id)}
-            >
-              <div class="shape-selector-item-buttons">
-                <button
-                  on:click={(event) => {
-                    event.stopPropagation();
-                    ShapeSelectorDialog.duplicateShape(shape.id);
-                  }}
-                  on:keydown={(event) => {
-                    if (event.key === 'Enter') {
+        <div class="shape-selector-search">
+          <input
+            value={searchTerm}
+            on:input={(event) =>
+              ShapeSelectorDialog.handleSearch(event.target.value)}
+            placeholder="Search"
+            style="background-image: url('icons/search-icon.png');"
+          />
+        </div>
+        <div class="shape-selector-grid">
+          <div class="shape-selector-grid-inner">
+            {#each filteredShapes as shape (shape.id)}
+              <button
+              transition:fade="{{ duration: 500 }}"
+                class="shape-selector-item {shape.id === selectedItemId
+                  ? 'selected'
+                  : ''}"
+                on:mouseenter={() => (shape.hover = true)}
+                on:mouseleave={() => (shape.hover = false)}
+                on:focus={() => (shape.hover = true)}
+                on:blur={() => (shape.hover = false)}
+                on:click={() => ShapeSelectorDialog.setSelectedItemId(shape.id)}
+              >
+                <div class="shape-selector-item-buttons">
+                  <button
+                    on:click={(event) => {
                       event.stopPropagation();
                       ShapeSelectorDialog.duplicateShape(shape.id);
-                    }
-                  }}
-                  aria-label="Duplicate shape"
-                  class="duplicate-icon"
-                  style="display: {shape.hover
-                    ? 'block'
-                    : 'none'}; background-image: url('icons/duplicate-icon.png');"
-                />
+                    }}
+                    on:keydown={(event) => {
+                      if (event.key === 'Enter') {
+                        event.stopPropagation();
+                        ShapeSelectorDialog.duplicateShape(shape.id);
+                      }
+                    }}
+                    aria-label="Duplicate shape"
+                    class="duplicate-icon"
+                    style="display: {shape.hover
+                      ? 'block'
+                      : 'none'}; background-image: url('icons/duplicate-icon.png');"
+                  />
 
-                <button
-                  on:click={(event) => {
-                    event.stopPropagation();
-                    ShapeSelectorDialog.deleteShape(shape.id);
-                  }}
-                  on:keydown={(event) => {
-                    if (event.key === 'Enter') {
+                  <button
+                    on:click={(event) => {
                       event.stopPropagation();
                       ShapeSelectorDialog.deleteShape(shape.id);
-                    }
-                  }}
-                  aria-label="Delete shape"
-                  class="delete-icon {shape.deletable ? '' : 'button-disabled'}"
-                  style="display: {shape.hover
-                    ? 'block'
-                    : 'none'}; background-image: url('icons/delete-icon.png');"
-                  disabled={!shape.deletable}
-                />
-              </div>
-              <div class="shape-selector-details">
-                <div class="shape-selector-item-image-div">
-                  <img
-                    class="shape-selector-item-image"
-                    src={shape.image}
-                    alt=""
+                    }}
+                    on:keydown={(event) => {
+                      if (event.key === 'Enter') {
+                        event.stopPropagation();
+                        ShapeSelectorDialog.deleteShape(shape.id);
+                      }
+                    }}
+                    aria-label="Delete shape"
+                    class="delete-icon {shape.deletable
+                      ? ''
+                      : 'button-disabled'}"
+                    style="display: {shape.hover
+                      ? 'block'
+                      : 'none'}; background-image: url('icons/delete-icon.png');"
+                    disabled={!shape.deletable}
                   />
                 </div>
-                <div
-                  class="shape-selector-item-name {shape.id === selectedItemId
-                    ? 'font-selected'
-                    : ''}"
-                >
-                  {shape.name}
+                <div class="shape-selector-details">
+                  <div class="shape-selector-item-image-div">
+                    <img
+                      class="shape-selector-item-image"
+                      src={shape.image}
+                      alt=""
+                    />
+                  </div>
+                  <div
+                    class="shape-selector-item-name {shape.id === selectedItemId
+                      ? 'font-selected'
+                      : ''}"
+                  >
+                    {shape.name}
+                  </div>
                 </div>
-              </div>
-            </button>
-          {/each}
+              </button>
+            {/each}
+          </div>
         </div>
       </div>
     </div>
   </div>
 </div>
-</div>
-

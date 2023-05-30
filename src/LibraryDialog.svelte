@@ -2,6 +2,7 @@
   import { GalapagosShapeSelectorLibrary } from './ShapeSelectorLibrary.ts';
   import { onMount } from 'svelte';
   import { writable } from 'svelte/store';
+  import {fade} from 'svelte/transition';
 
   let dialog;
   let header;
@@ -12,6 +13,7 @@
   let shapes = [];
   let selectedItemId = null;
   export let closeLibrary;
+  export let addNewShape;
 
   // Create writable stores for shapes, filteredShapes, and selectedItemId
   const shapesStore = writable([]);
@@ -46,25 +48,37 @@
     let isDown = false;
     let offset = [0, 0];
 
-    header.addEventListener('mousedown', (event) => {
-      isDown = true;
-      offset = [
-        dialog.offsetLeft - event.clientX,
-        dialog.offsetTop - event.clientY
-      ];
-    }, true);
+    header.addEventListener(
+      'mousedown',
+      (event) => {
+        isDown = true;
+        offset = [
+          dialog.offsetLeft - event.clientX,
+          dialog.offsetTop - event.clientY,
+        ];
+      },
+      true,
+    );
 
-    document.addEventListener('mouseup', () => {
-      isDown = false;
-    }, true);
+    document.addEventListener(
+      'mouseup',
+      () => {
+        isDown = false;
+      },
+      true,
+    );
 
-    document.addEventListener('mousemove', (event) => {
-      event.preventDefault();
-      if (isDown) {
-        dialog.style.left = (event.clientX + offset[0]) + 'px';
-        dialog.style.top  = (event.clientY + offset[1]) + 'px';
-      }
-    }, true);
+    document.addEventListener(
+      'mousemove',
+      (event) => {
+        event.preventDefault();
+        if (isDown) {
+          dialog.style.left = event.clientX + offset[0] + 'px';
+          dialog.style.top = event.clientY + offset[1] + 'px';
+        }
+      },
+      true,
+    );
   });
 
   // Subscribe to the stores
@@ -155,7 +169,7 @@
   .shape-selector-library-dialog .inner-container {
     display: flex;
     flex-direction: column;
-    padding: 0 1.5625rem 0.84375rem 1.5625rem; /* 0 25px/16 13.5px/16 25px/16*/
+    padding: 0 1.5625rem 0 1.5625rem; /* 0 25px/16 13.5px/16 25px/16*/
   }
 
   .shape-selector-library-dialog .selected-button img {
@@ -207,7 +221,7 @@
   .shape-selector-library-dialog .shape-selector-grid-inner {
     overflow-y: auto;
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     grid-gap: 0.3125rem; /* 5px/16 */
     width: 100%;
     height: 11.25rem; /* 180px/16 */
@@ -282,19 +296,50 @@
     color: #7d7d7d;
     margin-top: 0.25rem; /* 4px/16 */
   }
+
+  .shape-selector-library-dialog .import-cancel-buttons-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin: /*13.5 px/16 9px/16 13.5px/16 9px/16*/ 0.84375rem 0.5625rem 0.84375rem 0.5625rem;
+  }
+
+  .shape-selector-library-dialog .import-cancel-buttons{
+    display: flex;
+    flex-direction: row;
+  }
+
+  .shape-selector-library-dialog .import-cancel-buttons .import-button {
+    margin-right: 0.3125rem; /* 5px/16 */
+  }
+
+  .shape-selector-library-dialog .import-cancel-buttons button {
+    box-sizing: border-box;
+    width: 2.75rem; /* 44px/16 */
+    height: 1.3125rem; /* 21px/16 */
+    background: #E5E5E5;
+    border: 0.7px solid #D9D9D9;
+    border-radius: 1px;
+    font-family: 'Lato';
+    font-style: normal;
+    font-weight: 600;
+    font-size: /* 9px/16 */ 0.5625rem;
+    line-height: /* 11px/16 */ 0.6875rem;
+    display: flex;
+    align-items: center;
+    justify-content: center ;
+    color: #000000;
+    padding: 0;
+    cursor: pointer;
+  }
+
 </style>
 
-<div
-  class="shape-selector-library-dialog"
-  bind:this={dialog}
->
+<div class="shape-selector-library-dialog" bind:this={dialog} transition:fade="{{ duration: 500 }}">
   <div class="shape-selector-library">
     <div class="shape-selector-header" bind:this={header}>
       <h2>Library</h2>
-      <button
-        class="close-button"
-        on:click={closeLibrary}
-      > 
+      <button class="close-button" on:click={closeLibrary}>
         <img src="icons/close-button.png" alt="X" />
       </button>
     </div>
@@ -342,5 +387,26 @@
         </div>
       </div>
     </div>
+    <div class="import-cancel-buttons-container">
+      <div class="import-cancel-buttons">
+        <button
+        class="import-button"
+        on:click={() => {
+          if (selectedItemId) {
+            addNewShape(shapes.find((shape) => shape.id === selectedItemId));
+            closeLibrary();
+          }
+        }}
+      >
+        Import
+      </button>
+      <button
+      class="cancel-button"
+      on:click={closeLibrary}
+    >
+      Cancel
+    </button>
+    </div>
   </div>
+</div>
 </div>
