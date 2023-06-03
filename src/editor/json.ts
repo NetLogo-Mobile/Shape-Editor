@@ -1,5 +1,4 @@
-import { Shape } from "./geometry";
-
+import { Shape } from './geometry';
 
 /**
  * Type representing a shape in JSON format.
@@ -16,7 +15,7 @@ export type JSONShape = {
 
   /** An array of elements making up the shape. */
   elements: JSONElement[];
-}
+};
 
 /**
  * Interface representing a JSON element.
@@ -33,7 +32,7 @@ export type JSONBaseElement = {
 
   /** ???? */
   marked: boolean;
-}
+};
 
 /**
  * Interface representing a line in JSON format.
@@ -50,11 +49,11 @@ export type JSONLine = JSONBaseElement & {
 
   /** Y-coordinate of the ending point of the line. */
   y2: number;
-}
+};
 
 /**
  * Interface representing a circle in JSON format.
- * 
+ *
  * @remarks
  * The center of the circle is at `x + diam / 2`, `y + diam / 2`.
  */
@@ -67,7 +66,7 @@ export type JSONCircle = JSONBaseElement & {
 
   /** Diameter of the circle. */
   diam: number;
-}
+};
 
 /**
  * Interface representing a rectangle in JSON format.
@@ -84,7 +83,7 @@ export type JSONRectangle = JSONBaseElement & {
 
   /** Y-coordinate of the bottom edge of the rectangle. */
   ymax: number;
-}
+};
 
 /**
  * Interface representing a polygon in JSON format.
@@ -95,7 +94,7 @@ export type JSONPolygon = JSONBaseElement & {
 
   /** An array of y-coordinates of the vertices of the polygon. */
   ycors: number[];
-}
+};
 
 /**
  * Type representing a JSON element.

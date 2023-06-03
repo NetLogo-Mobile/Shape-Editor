@@ -10,7 +10,7 @@ is maintained after the transformation (top-left corner remains at top-left).
 @param transformation A transformation function from R2 to R2.
 -->
 <script lang="ts">
-  import type { R2, Shape } from "./geometry";
+  import type { R2, Shape } from './geometry';
 
   /**
    * A transformation function from R2 to R2.

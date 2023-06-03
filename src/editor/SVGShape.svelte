@@ -9,8 +9,8 @@ It also changes the cursor style based on the current selected tool and shape.
 @param currentTool The current drawing tool being used.
 -->
 <script lang="ts">
-  import { R2, Shape } from "./geometry";
-  import { Tool } from "./tool";
+  import { R2, Shape } from './geometry';
+  import { Tool } from './tool';
 
   /** The shape to be drawn. */
   export let shape: Shape;
@@ -25,16 +25,16 @@ It also changes the cursor style based on the current selected tool and shape.
   /** The stroke width of the SVG */
   $: strokeWidth = shape.filled ? 0 : 2;
   /** The fill color of the SVG */
-  $: fill = shape.filled ? shape.color : "none";
+  $: fill = shape.filled ? shape.color : 'none';
   /** The stroke color of the SVG */
-  $: strokeColor = shape.filled ? "none" : shape.color;
+  $: strokeColor = shape.filled ? 'none' : shape.color;
   /** The cursor style of the SVG */
   $: cursor =
     currentTool !== Tool.SELECT
-      ? "crosshair"
+      ? 'crosshair'
       : currentShape === shape
-      ? "move"
-      : "pointer";
+      ? 'move'
+      : 'pointer';
 
   /**
    * If the current tool is the selection tool, the current shape is set to this shape.
@@ -82,7 +82,7 @@ It also changes the cursor style based on the current selected tool and shape.
     stroke-width={strokeWidth}
     stroke={strokeColor}
     {fill}
-    points={shape.points.map((coord) => `${coord.x},${coord.y}`).join(" ")}
+    points={shape.points.map((coord) => `${coord.x},${coord.y}`).join(' ')}
     {cursor}
   />
 {:else if shape.type === Shape.Type.RECTANGLE}

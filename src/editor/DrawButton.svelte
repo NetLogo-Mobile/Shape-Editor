@@ -9,8 +9,8 @@ If the selected tool is the selection tool, the current shape is also cleared.
 @param currentTool The current drawing tool. Should be bound.
 -->
 <script lang="ts">
-  import type { Shape } from "./geometry";
-  import { Tool } from "./tool";
+  import type { Shape } from './geometry';
+  import { Tool } from './tool';
 
   /** The current shape being manipulated. It is cleared when the selection tool is chosen. */
   export let currentShape: Shape | null = null;

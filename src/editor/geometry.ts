@@ -1,4 +1,11 @@
-import { JSONElement, JSONLine, JSONCircle, JSONRectangle, JSONPolygon, JSONBaseElement } from "./json";
+import {
+  JSONElement,
+  JSONLine,
+  JSONCircle,
+  JSONRectangle,
+  JSONPolygon,
+  JSONBaseElement,
+} from './json';
 
 /** A constant used to scale the canvas size. */
 export const SCALE = 300;
@@ -13,7 +20,7 @@ export type R2 = {
 
   /** Y-coordinate of the point. */
   y: number;
-}
+};
 
 /**
  * Namespace containing functions for working with 2D points.
@@ -29,8 +36,8 @@ export namespace R2 {
     const rect: DOMRect = canvas.getBoundingClientRect();
 
     return {
-      x: SCALE * (event.clientX - rect.left) / rect.width,
-      y: SCALE * (event.clientY - rect.top) / rect.height,
+      x: (SCALE * (event.clientX - rect.left)) / rect.width,
+      y: (SCALE * (event.clientY - rect.top)) / rect.height,
     };
   }
 
@@ -79,16 +86,25 @@ export class Shape {
     switch (shape.type) {
       case Shape.Type.LINE:
         const line = shape as JSONLine;
-        points = [{ x: line.x1, y: line.y1 }, { x: line.x2, y: line.y2 }];
+        points = [
+          { x: line.x1, y: line.y1 },
+          { x: line.x2, y: line.y2 },
+        ];
         break;
       case Shape.Type.CIRCLE:
         const circle = shape as JSONCircle;
         const radius = circle.diam / 2;
-        points = [{ x: circle.x + radius, y: circle.y + radius }, { x: circle.x + radius, y: circle.y }];
+        points = [
+          { x: circle.x + radius, y: circle.y + radius },
+          { x: circle.x + radius, y: circle.y },
+        ];
         break;
       case Shape.Type.RECTANGLE:
         const rect = shape as JSONRectangle;
-        points = [{ x: rect.xmin, y: rect.ymin }, { x: rect.xmax, y: rect.ymax }];
+        points = [
+          { x: rect.xmin, y: rect.ymin },
+          { x: rect.xmax, y: rect.ymax },
+        ];
         break;
       case Shape.Type.POLYGON:
         const poly = shape as JSONPolygon;
@@ -110,7 +126,7 @@ export class Shape {
       color: this.color,
       filled: this.filled,
       marked: false,
-    }
+    };
 
     switch (this.type) {
       case Shape.Type.LINE:
@@ -140,8 +156,8 @@ export class Shape {
       case Shape.Type.POLYGON:
         return {
           ...common,
-          xcors: this.points.map(point => point.x),
-          ycors: this.points.map(point => point.y),
+          xcors: this.points.map((point) => point.x),
+          ycors: this.points.map((point) => point.y),
         };
     }
   }
@@ -181,7 +197,7 @@ export namespace Transforms {
   export function flipHorizontal(point: R2): R2 {
     return {
       x: SCALE - point.x,
-      y: point.y
+      y: point.y,
     };
   }
 
@@ -193,7 +209,7 @@ export namespace Transforms {
   export function flipVertical(point: R2): R2 {
     return {
       x: point.x,
-      y: SCALE - point.y
+      y: SCALE - point.y,
     };
   }
 
@@ -205,7 +221,7 @@ export namespace Transforms {
   export function rotateCW(point: R2): R2 {
     return {
       x: SCALE - point.y,
-      y: point.x
+      y: point.x,
     };
   }
 
@@ -217,7 +233,7 @@ export namespace Transforms {
   export function rotateCCW(point: R2): R2 {
     return {
       x: point.y,
-      y: SCALE - point.x
+      y: SCALE - point.x,
     };
   }
 
@@ -230,7 +246,7 @@ export namespace Transforms {
   export function translate(point: R2, delta: R2): R2 {
     return {
       x: point.x + delta.x,
-      y: point.y + delta.y
+      y: point.y + delta.y,
     };
   }
 }

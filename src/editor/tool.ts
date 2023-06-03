@@ -1,4 +1,4 @@
-import { Shape } from "./geometry";
+import { Shape } from './geometry';
 
 /**
  * Enum representing the set of available tools.
