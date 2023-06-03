@@ -1,258 +1,244 @@
+<!--
+This component provides the functionality of a drawable canvas where shapes can be added, moved, and manipulated. 
+Different drawing tools can be selected, including the selection tool, which allows selecting and manipulating existing shapes. 
+
+@component
+@param name The name of the shape. Should be bound.
+@param currentTool The current drawing tool. Should be bound.
+@param currentColor The current drawing color. Should be bound.
+@param editableColorIndex The editable color index. Should be bound.
+@param rotate A flag indicating whether shapes should be rotatable. Should be bound.
+@param currentShape The current shape being drawn or manipulated. Should be bound.
+@param shapes The array of shapes on the canvas. Should be bound.
+
+@remarks
+The `importShape` and `reset` functions should be bound to the editor.
+-->
+
 <script lang="ts">
-  import type { JSONShape } from './json_shape';
-  import type { Shape } from './shape';
-  import { Tool } from './tool';
-  import { posToCoords } from './transform';
-  import { JSONElementtoSVG } from './translation';
+  import EditHandle from './EditHandle.svelte';
+  import SvgShape from './SVGShape.svelte';
+  import { JSONElementType, type JSONShape } from './json';
+  import { fromJSON, type Shape } from './shape';
+  import { Tool, toolToFilled, toolToType } from './tool';
+  import { posToCoords, type R2 } from './coords';
 
+  const DEFAULT_COLOR = '#FFFFFF';
+
+  /** The name of the shape. */
   export let name: string = 'default';
-  export let current_tool: Tool = Tool.Select;
-  export let current_color: Color = '#FFFFFF';
-  export let editable_color_index: number = 0;
+  /** The current tool being used. */
+  export let currentTool: Tool = Tool.SELECT;
+  /** The current drawing color. */
+  export let currentColor: string = DEFAULT_COLOR;
+  /** The editable color index. */
+  export let editableColorIndex: number = 0;
+  /** Whether shapes should be rotatable. */
   export let rotate: boolean = true;
+  /** The current shape being drawn or manipulated. */
+  export let currentShape: Shape | null = null;
+  /** The array of shapes on the canvas. */
+  export let shapes: Shape[] = [];
 
-  let current_shape: Shape | null = null;
-  let shapes: Shape[] = [];
+  /** The canvas element. */
+  let canvas: Element;
 
+  /** The edit handles. */
+  let handles: EditHandle[] = [];
+  /** Whether the edit handles are grabbed. */
+  let handlesGrabbed: boolean[] = [];
+  /** Whether the shape is grabbed. */
+  let grabbingShape: boolean = false;
+  /** The grabbed position. */
+  let grabPos: R2;
+  /** Whether the handle is grabbed. */
+  $: grabbingHandle = handlesGrabbed.includes(true);
+  /** The current cursor. */
+  $: cursor =
+    currentTool !== Tool.SELECT
+      ? 'crosshair'
+      : grabbingHandle
+      ? 'grabbed'
+      : grabbingShape
+      ? 'move'
+      : 'default';
+
+  /**
+   * Handles a mouse movement event.
+   * @param event The mouse movement event.
+   *
+   * @remarks
+   * Since the mouse movement is often fast enough that it will move outside of certain elements, we must handle mouse movements in the canvas.
+   * This includes the edit handles and the shapes themselves.
+   */
   function handleMove(event: MouseEvent) {
-    if (!current_shape) {
+    if (!currentShape) {
       return;
     }
 
-    const canvas: HTMLElement = document.querySelector('#canvas')!;
-    let coords = posToCoords(canvas, {
+    const coords = posToCoords(canvas, {
       x: event.clientX,
       y: event.clientY,
     });
 
-    switch (current_tool) {
-      case Tool.Select:
-      case Tool.Delete:
-        break;
-      case Tool.DrawLine:
-        if (current_shape.coords.length == 1) {
-          current_shape.svg.setAttribute(
-            'x1',
-            current_shape.coords[0].x.toString(),
-          );
-          current_shape.svg.setAttribute(
-            'y1',
-            current_shape.coords[0].y.toString(),
-          );
-        }
-        current_shape.svg.setAttribute('x2', coords.x.toString());
-        current_shape.svg.setAttribute('y2', coords.y.toString());
-        break;
-      case Tool.DrawRectangle:
-      case Tool.DrawFilledRectangle:
-        if (current_shape.coords.length == 1) {
-          current_shape.svg.setAttribute(
-            'x',
-            Math.min(current_shape.coords[0].x, coords.x).toString(),
-          );
-          current_shape.svg.setAttribute(
-            'y',
-            Math.min(current_shape.coords[0].y, coords.y).toString(),
-          );
-        }
+    if (currentTool !== Tool.SELECT) {
+      currentShape.points[currentShape.points.length - 1] = coords;
+    } else {
+      // we need to handle movement in the canvas because the mouse is too fast
+      if (grabbingShape && !grabbingHandle) {
+        currentShape.points = currentShape.points.map((coord) => {
+          return {
+            x: coord.x + coords.x - grabPos.x,
+            y: coord.y + coords.y - grabPos.y,
+          };
+        });
 
-        current_shape.svg.setAttribute(
-          'width',
-          Math.abs(coords.x - current_shape.coords[0].x).toString(),
-        );
-        current_shape.svg.setAttribute(
-          'height',
-          Math.abs(coords.y - current_shape.coords[0].y).toString(),
-        );
+        grabPos = coords;
+      }
 
-        break;
-      case Tool.DrawCircle:
-      case Tool.DrawFilledCircle:
-        if (current_shape.coords.length == 1) {
-          current_shape.svg.setAttribute(
-            'cx',
-            current_shape.coords[0].x.toString(),
-          );
-          current_shape.svg.setAttribute(
-            'cy',
-            current_shape.coords[0].y.toString(),
-          );
+      for (let i = 0; i < handles.length; i++) {
+        if (handlesGrabbed[i]) {
+          currentShape.points[i] = coords;
         }
-
-        current_shape.svg.setAttribute(
-          'r',
-          Math.sqrt(
-            Math.pow(coords.x - current_shape.coords[0].x, 2) +
-              Math.pow(coords.y - current_shape.coords[0].y, 2),
-          ).toString(),
-        );
-        break;
-      case Tool.DrawFilledPolygon:
-      case Tool.DrawPolygon:
-        if (current_shape.coords.length == 0) {
-          current_shape.svg.setAttribute('points', `${coords.x},${coords.y}`);
-        } else {
-          current_shape.svg.setAttribute(
-            'points',
-            current_shape.coords
-              .map((coord) => `${coord.x},${coord.y}`)
-              .join(' ') + ` ${coords.x},${coords.y}`,
-          );
-        }
-        break;
+      }
     }
 
-    current_shape.svg.setAttribute('stroke-width', '1');
-    switch (current_tool) {
-      case Tool.Select:
-      case Tool.Delete:
-        break;
-      case Tool.DrawLine:
-        current_shape.svg.setAttribute('stroke', current_color.toString());
-        break;
-      case Tool.DrawRectangle:
-      case Tool.DrawCircle:
-      case Tool.DrawPolygon:
-        current_shape.svg.setAttribute('stroke', current_color.toString());
-        current_shape.svg.setAttribute('fill', 'none');
-        break;
-      case Tool.DrawFilledRectangle:
-      case Tool.DrawFilledCircle:
-      case Tool.DrawFilledPolygon:
-        current_shape.svg.setAttribute('stroke', 'none');
-        current_shape.svg.setAttribute('fill', current_color.toString());
-        break;
-    }
+    shapes = shapes;
   }
 
+  /**
+   * Handles a mouse release event.
+   * @param event The mouse release event.
+   */
+  function handleRelease(event: MouseEvent) {
+    let coords = posToCoords(canvas, {
+      x: event.clientX,
+      y: event.clientY,
+    });
+    grabbingShape = false;
+
+    if (!currentShape) {
+      return;
+    }
+
+    if (
+      coords.x == currentShape.points[0].x &&
+      coords.y == currentShape.points[0].y
+    ) {
+      return;
+    }
+
+    if (toolToType(currentTool) == JSONElementType.POLYGON) {
+      return;
+    }
+
+    if (currentTool === Tool.SELECT) {
+      return;
+    }
+
+    handleClick(event);
+  }
+
+  /**
+   * Handles a mouse click event.
+   * @param event The mouse click event.
+   */
   function handleClick(event: MouseEvent) {
-    const canvas: HTMLElement = document.querySelector('#canvas')!;
+    if (currentTool === Tool.SELECT && event.target === canvas) {
+      currentShape = null;
+    }
+
     let coords = posToCoords(canvas, {
       x: event.clientX,
       y: event.clientY,
     });
 
-    switch (current_tool) {
-      case Tool.Select:
-      case Tool.Delete:
-        break;
-      case Tool.DrawLine:
-        if (!current_shape) {
-          current_shape = {
-            coords: [coords],
-            svg: document.createElementNS('http://www.w3.org/2000/svg', 'line'),
-          };
-          canvas.appendChild(current_shape.svg);
+    if (currentTool !== Tool.SELECT) {
+      if (!currentShape) {
+        currentShape = {
+          points: [coords, coords],
+          color: currentColor,
+          type: toolToType(currentTool)!,
+          filled: toolToFilled(currentTool),
+        };
+      } else {
+        currentShape.points[currentShape.points.length - 1] = coords;
+        if (
+          currentShape.points.length == 2 &&
+          toolToType(currentTool) != JSONElementType.POLYGON
+        ) {
+          shapes.push(currentShape);
+          currentShape = null;
         } else {
-          current_shape.coords.push(coords);
-          if (current_shape.coords.length == 2) {
-            canvas.appendChild(current_shape.svg);
-            shapes.push(current_shape);
-            current_shape = null;
-          }
-        }
-        break;
-      case Tool.DrawRectangle:
-      case Tool.DrawFilledRectangle:
-        if (!current_shape) {
-          current_shape = {
-            coords: [coords],
-            svg: document.createElementNS('http://www.w3.org/2000/svg', 'rect'),
-          };
-          canvas.appendChild(current_shape.svg);
-        } else {
-          current_shape.coords.push(coords);
-          if (current_shape.coords.length == 2) {
-            canvas.appendChild(current_shape.svg);
-            shapes.push(current_shape);
-            current_shape = null;
-          }
-        }
-        break;
-      case Tool.DrawCircle:
-      case Tool.DrawFilledCircle:
-        if (!current_shape) {
-          current_shape = {
-            coords: [coords],
-            svg: document.createElementNS(
-              'http://www.w3.org/2000/svg',
-              'circle',
-            ),
-          };
-          canvas.appendChild(current_shape.svg);
-        } else {
-          current_shape.coords.push(coords);
-          if (current_shape.coords.length == 2) {
-            canvas.appendChild(current_shape.svg);
-            shapes.push(current_shape);
-            current_shape = null;
-          }
-        }
-        break;
-      case Tool.DrawPolygon:
-      case Tool.DrawFilledPolygon:
-        if (!current_shape) {
-          current_shape = {
-            coords: [coords],
-            svg: document.createElementNS(
-              'http://www.w3.org/2000/svg',
-              'polygon',
-            ),
-          };
-          canvas.appendChild(current_shape.svg);
-        } else {
-          current_shape.coords.push(coords);
-          const lastLastCoord =
-            current_shape.coords[current_shape.coords.length - 2];
-          const lastCoord =
-            current_shape.coords[current_shape.coords.length - 1];
+          const lastLastCoord = currentShape.points.at(-2)!;
+          const lastCoord = coords;
 
           if (
             lastCoord.x == lastLastCoord.x &&
             lastCoord.y == lastLastCoord.y
           ) {
-            current_shape.coords.pop();
-            canvas.appendChild(current_shape.svg);
-            shapes.push(current_shape);
-            current_shape = null;
+            currentShape.points.pop();
+            shapes.push(currentShape);
+            currentShape = null;
+          } else {
+            currentShape.points.push(coords);
           }
         }
-        break;
+      }
+    } else {
+      grabbingShape = true;
+      grabPos = coords;
     }
   }
 
+  /**
+   * Imports a shape into the canvas.
+   * @param shape The shape to import.
+   */
   export function importShape(shape: JSONShape) {
-    const canvas = document.querySelector('#canvas')!;
     name = shape.name;
-    editable_color_index = shape.editableColorIndex;
+    editableColorIndex = shape.editableColorIndex;
     rotate = shape.rotate;
 
     const elements = shape.elements;
     for (var element of elements) {
-      canvas.appendChild(JSONElementtoSVG(element));
+      const shape = fromJSON(element);
+      shapes.push(shape);
     }
+
+    shapes = shapes;
   }
 
+  /**
+   * Resets the canvas.
+   */
   export function reset() {
-    const canvas = document.querySelector('#canvas')!;
     name = 'default';
-    current_tool = Tool.Select;
-    current_color = '#000000';
-    editable_color_index = 0;
+    currentTool = Tool.SELECT;
+    currentColor = DEFAULT_COLOR;
+    editableColorIndex = 0;
     rotate = true;
 
-    while (canvas.childElementCount > 1) {
-      canvas.removeChild(canvas.lastChild!);
-    }
+    shapes = [];
+    currentShape = null;
   }
 </script>
+
+<style>
+  #canvas {
+    background-color: darkslategray;
+  }
+</style>
 
 <svg
   on:mousemove={handleMove}
   on:mousedown={handleClick}
+  on:mouseup={handleRelease}
+  bind:this={canvas}
   id="canvas"
   xmlns="http://www.w3.org/2000/svg"
   viewBox="0 0 300 300"
+  {cursor}
 >
   <g id="grid" stroke="rgba(255, 255, 255, 0.1)" stroke-width="0.5">
     {#each { length: 11 } as _, i}
@@ -262,6 +248,28 @@
     {#each { length: 11 } as _, i}
       <line x1="0" y1={i * 30} x2="300" y2={i * 30} />
     {/each}
+  </g>
+  <g id="shape">
+    {#each shapes as shape}
+      <SvgShape bind:shape bind:currentShape bind:currentTool />
+    {/each}
+    <!-- if the current shape isn't in the shape stack -->
+    {#if currentShape != null && currentTool != Tool.SELECT}
+      <SvgShape bind:shape={currentShape} bind:currentShape bind:currentTool />
+    {/if}
+  </g>
+  <g id="handles" fill="white" stroke="black" stroke-width="1">
+    {#if currentShape != null && currentTool === Tool.SELECT}
+      {#each currentShape.points as _, i}
+        <EditHandle
+          bind:this={handles[i]}
+          bind:grabbed={handlesGrabbed[i]}
+          bind:canvas
+          bind:shape={currentShape}
+          index={i}
+        />
+      {/each}
+    {/if}
   </g>
   <slot />
 </svg>

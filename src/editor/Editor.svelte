@@ -1,30 +1,78 @@
+<!--
+This component represents an editor for shapes drawn on the canvas.
+
+@component
+@param open - The function to open the editor. Should be bound to a button. Takes an optional argument, the shape to edit.
+@param closeHook - The hook to call when the editor is closed. Takes the JSON representation of the shape as an argument.
+-->
+
 <script lang="ts">
-  import ToolButton from './ToolButton.svelte';
+  import DrawButton from './DrawButton.svelte';
   import { Tool } from './tool';
   import Canvas from './Canvas.svelte';
-  import { JSONShape } from './json_shape';
+  import type { JSONShape } from './json';
+  import { toJSON, type Shape } from './shape';
+  import TransformButton from './TransformButton.svelte';
+  import { rotateCCW } from './transforms';
 
+  /** The name of the shape. */
   let name: string = 'default';
-  let current_tool: Tool = Tool.Select;
-  let current_color: Color = '#FFFFFF';
-  let editable_color_index: number = 0;
+  /** The current tool being used. */
+  let currentTool: Tool = Tool.SELECT;
+  /** The current drawing color. */
+  let currentColor: string = '#FFFFFF';
+  /** The editable color index. */
+  let editableColorIndex: number = 0;
+  /** Whether shapes should be rotatable. */
   let rotate: boolean = true;
 
+  /** The array of shapes on the canvas. */
+  let shapes: Shape[] = [];
+  /** The current shape being drawn or manipulated. */
+  let currentShape: Shape | null = null;
+
+  /**
+   * Imports a shape from a JSON representation.
+   * @param shape The shape to import.
+   */
   let canvasImport: (shape: JSONShape) => void;
+  /** Resets the canvas. */
   let canvasReset: () => void;
+  /**
+   * Hook for closing the editor.
+   * @param shape The JSON representation of the shape on the canvas.
+   */
+  export let closeHook: (shape: JSONShape) => void;
 
-  export const open = () => {
+  /**
+   * Opens the editor dialog.
+   * @param input The object to import.
+   */
+  export const open = (input?: JSONShape) => {
+    if (input) {
+      canvasImport(input as JSONShape);
+    }
     const dialog: HTMLDialogElement = document.querySelector('#editor')!;
     dialog.showModal();
   };
 
-  export const openWithJSON = (input: string) => {
-    canvasImport(JSON.parse(input));
-    const dialog: HTMLDialogElement = document.querySelector('#editor')!;
-    dialog.showModal();
+  /**
+   * Saves the shapes.
+   */
+  const toJSONShape: () => JSONShape = () => {
+    return {
+      name: name,
+      elements: shapes.map((shape) => toJSON(shape)),
+      editableColorIndex: editableColorIndex,
+      rotate: rotate,
+    };
   };
 
+  /**
+   * Closes the editor dialog.
+   */
   const close = () => {
+    closeHook(toJSONShape());
     canvasReset();
     const dialog: HTMLDialogElement = document.querySelector('#editor')!;
     dialog.close();
@@ -34,31 +82,29 @@
 <dialog id="editor">
   <h1 contenteditable="true" bind:textContent={name}>{name}</h1>
   <button on:click={close}>Close</button>
-  <ToolButton bind:current_tool button_tool={Tool.Select}>Select</ToolButton>
-  <ToolButton bind:current_tool button_tool={Tool.DrawRectangle}
-    >Rectangle</ToolButton
+  <DrawButton bind:currentShape bind:currentTool tool={Tool.SELECT}
+    >Select</DrawButton
   >
-  <ToolButton bind:current_tool button_tool={Tool.DrawCircle}>Circle</ToolButton
+  <DrawButton bind:currentShape bind:currentTool tool={Tool.RECTANGLE}
+    >Rectangle</DrawButton
   >
-  <ToolButton bind:current_tool button_tool={Tool.DrawPolygon}
-    >Polygon</ToolButton
+  <DrawButton bind:currentShape bind:currentTool tool={Tool.CIRCLE}
+    >Circle</DrawButton
   >
-  <ToolButton bind:current_tool button_tool={Tool.DrawLine}>Line</ToolButton>
-  <ToolButton bind:current_tool button_tool={Tool.DrawFilledRectangle}
-    >Filled Rectangle</ToolButton
+  <DrawButton bind:currentShape bind:currentTool tool={Tool.POLYGON}
+    >Polygon</DrawButton
   >
-  <ToolButton bind:current_tool button_tool={Tool.DrawFilledCircle}
-    >Filled Circle</ToolButton
-  >
-  <ToolButton bind:current_tool button_tool={Tool.DrawFilledPolygon}
-    >Filled Polygon</ToolButton
+  <TransformButton bind:currentShape bind:shapes transformation={rotateCCW}
+    >Rotate CCW</TransformButton
   >
   <Canvas
-    bind:current_tool
-    bind:current_color
-    bind:editable_color_index
+    bind:currentTool
+    bind:currentColor
+    bind:editableColorIndex
     bind:name
     bind:rotate
+    bind:shapes
+    bind:currentShape
     bind:importShape={canvasImport}
     bind:reset={canvasReset}
   />
