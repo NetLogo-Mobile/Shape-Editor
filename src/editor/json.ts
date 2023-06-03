@@ -1,7 +1,10 @@
+import { Shape } from "./geometry";
+
+
 /**
- * Interface representing a shape in JSON format.
+ * Type representing a shape in JSON format.
  */
-export interface JSONShape {
+export type JSONShape = {
   /** Name of the shape. */
   name: string;
 
@@ -16,28 +19,11 @@ export interface JSONShape {
 }
 
 /**
- * Enum representing the types of JSON elements.
- */
-export enum JSONElementType {
-  /** Represents a line. */
-  LINE = 'line',
-
-  /** Represents a circle. */
-  CIRCLE = 'circle',
-
-  /** Represents a rectangle. */
-  RECTANGLE = 'rectangle',
-
-  /** Represents a polygon. */
-  POLYGON = 'polygon',
-}
-
-/**
  * Interface representing a JSON element.
  */
-interface JSONBaseElement {
+export type JSONBaseElement = {
   /** The type of the JSON element. */
-  type: JSONElementType;
+  type: Shape.Type;
 
   /** The color of the JSON element. */
   color: string;
@@ -52,7 +38,7 @@ interface JSONBaseElement {
 /**
  * Interface representing a line in JSON format.
  */
-export interface JSONLine extends JSONBaseElement {
+export type JSONLine = JSONBaseElement & {
   /** X-coordinate of the starting point of the line. */
   x1: number;
 
@@ -72,7 +58,7 @@ export interface JSONLine extends JSONBaseElement {
  * @remarks
  * The center of the circle is at `x + diam / 2`, `y + diam / 2`.
  */
-export interface JSONCircle extends JSONBaseElement {
+export type JSONCircle = JSONBaseElement & {
   /** X-coordinate of the top-left point of the bounding box of the circle. */
   x: number;
 
@@ -86,7 +72,7 @@ export interface JSONCircle extends JSONBaseElement {
 /**
  * Interface representing a rectangle in JSON format.
  */
-export interface JSONRectangle extends JSONBaseElement {
+export type JSONRectangle = JSONBaseElement & {
   /** X-coordinate of the left edge of the rectangle. */
   xmin: number;
 
@@ -103,7 +89,7 @@ export interface JSONRectangle extends JSONBaseElement {
 /**
  * Interface representing a polygon in JSON format.
  */
-export interface JSONPolygon extends JSONBaseElement {
+export type JSONPolygon = JSONBaseElement & {
   /** An array of x-coordinates of the vertices of the polygon. */
   xcors: number[];
 

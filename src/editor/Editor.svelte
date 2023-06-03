@@ -7,20 +7,19 @@ This component represents an editor for shapes drawn on the canvas.
 -->
 
 <script lang="ts">
-  import DrawButton from './DrawButton.svelte';
-  import { Tool } from './tool';
-  import Canvas from './Canvas.svelte';
-  import type { JSONShape } from './json';
-  import { toJSON, type Shape } from './shape';
-  import TransformButton from './TransformButton.svelte';
-  import { rotateCCW } from './transforms';
+  import DrawButton from "./DrawButton.svelte";
+  import { Tool } from "./tool";
+  import Canvas from "./Canvas.svelte";
+  import type { JSONShape } from "./json";
+  import TransformButton from "./TransformButton.svelte";
+  import { Shape, Transforms } from "./geometry";
 
   /** The name of the shape. */
-  let name: string = 'default';
+  let name: string = "default";
   /** The current tool being used. */
   let currentTool: Tool = Tool.SELECT;
   /** The current drawing color. */
-  let currentColor: string = '#FFFFFF';
+  let currentColor: string = "#FFFFFF";
   /** The editable color index. */
   let editableColorIndex: number = 0;
   /** Whether shapes should be rotatable. */
@@ -52,7 +51,7 @@ This component represents an editor for shapes drawn on the canvas.
     if (input) {
       canvasImport(input as JSONShape);
     }
-    const dialog: HTMLDialogElement = document.querySelector('#editor')!;
+    const dialog: HTMLDialogElement = document.querySelector("#editor")!;
     dialog.showModal();
   };
 
@@ -62,7 +61,7 @@ This component represents an editor for shapes drawn on the canvas.
   const toJSONShape: () => JSONShape = () => {
     return {
       name: name,
-      elements: shapes.map((shape) => toJSON(shape)),
+      elements: shapes.map((shape) => shape.toJSON()),
       editableColorIndex: editableColorIndex,
       rotate: rotate,
     };
@@ -74,7 +73,7 @@ This component represents an editor for shapes drawn on the canvas.
   const close = () => {
     closeHook(toJSONShape());
     canvasReset();
-    const dialog: HTMLDialogElement = document.querySelector('#editor')!;
+    const dialog: HTMLDialogElement = document.querySelector("#editor")!;
     dialog.close();
   };
 </script>
@@ -94,8 +93,10 @@ This component represents an editor for shapes drawn on the canvas.
   <DrawButton bind:currentShape bind:currentTool tool={Tool.POLYGON}
     >Polygon</DrawButton
   >
-  <TransformButton bind:currentShape bind:shapes transformation={rotateCCW}
-    >Rotate CCW</TransformButton
+  <TransformButton
+    bind:currentShape
+    bind:shapes
+    transformation={Transforms.rotateCCW}>Rotate CCW</TransformButton
   >
   <Canvas
     bind:currentTool

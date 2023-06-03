@@ -16,17 +16,16 @@ The `importShape` and `reset` functions should be bound to the editor.
 -->
 
 <script lang="ts">
-  import EditHandle from './EditHandle.svelte';
-  import SvgShape from './SVGShape.svelte';
-  import { JSONElementType, type JSONShape } from './json';
-  import { fromJSON, type Shape } from './shape';
-  import { Tool, toolToFilled, toolToType } from './tool';
-  import { posToCoords, type R2 } from './coords';
+  import EditHandle from "./EditHandle.svelte";
+  import SvgShape from "./SVGShape.svelte";
+  import type { JSONShape } from "./json";
+  import { Tool } from "./tool";
+  import { R2, Shape } from "./geometry";
 
-  const DEFAULT_COLOR = '#FFFFFF';
+  const DEFAULT_COLOR = "#FFFFFF";
 
   /** The name of the shape. */
-  export let name: string = 'default';
+  export let name: string = "default";
   /** The current tool being used. */
   export let currentTool: Tool = Tool.SELECT;
   /** The current drawing color. */
@@ -56,12 +55,12 @@ The `importShape` and `reset` functions should be bound to the editor.
   /** The current cursor. */
   $: cursor =
     currentTool !== Tool.SELECT
-      ? 'crosshair'
+      ? "crosshair"
       : grabbingHandle
-      ? 'grabbed'
+      ? "grabbed"
       : grabbingShape
-      ? 'move'
-      : 'default';
+      ? "move"
+      : "default";
 
   /**
    * Handles a mouse movement event.
@@ -76,10 +75,7 @@ The `importShape` and `reset` functions should be bound to the editor.
       return;
     }
 
-    const coords = posToCoords(canvas, {
-      x: event.clientX,
-      y: event.clientY,
-    });
+    const coords = R2.fromMouse(canvas, event);
 
     if (currentTool !== Tool.SELECT) {
       currentShape.points[currentShape.points.length - 1] = coords;
@@ -111,10 +107,7 @@ The `importShape` and `reset` functions should be bound to the editor.
    * @param event The mouse release event.
    */
   function handleRelease(event: MouseEvent) {
-    let coords = posToCoords(canvas, {
-      x: event.clientX,
-      y: event.clientY,
-    });
+    let coords = R2.fromMouse(canvas, event);
     grabbingShape = false;
 
     if (!currentShape) {
@@ -128,7 +121,7 @@ The `importShape` and `reset` functions should be bound to the editor.
       return;
     }
 
-    if (toolToType(currentTool) == JSONElementType.POLYGON) {
+    if (Tool.shapeType(currentTool) == Shape.Type.POLYGON) {
       return;
     }
 
@@ -148,24 +141,21 @@ The `importShape` and `reset` functions should be bound to the editor.
       currentShape = null;
     }
 
-    let coords = posToCoords(canvas, {
-      x: event.clientX,
-      y: event.clientY,
-    });
+    let coords = R2.fromMouse(canvas, event);
 
     if (currentTool !== Tool.SELECT) {
       if (!currentShape) {
-        currentShape = {
-          points: [coords, coords],
-          color: currentColor,
-          type: toolToType(currentTool)!,
-          filled: toolToFilled(currentTool),
-        };
+        currentShape = new Shape(
+          [coords, coords],
+          currentColor,
+          Tool.shapeType(currentTool)!,
+          Tool.isFilled(currentTool)
+        );
       } else {
         currentShape.points[currentShape.points.length - 1] = coords;
         if (
           currentShape.points.length == 2 &&
-          toolToType(currentTool) != JSONElementType.POLYGON
+          Tool.shapeType(currentTool) != Shape.Type.POLYGON
         ) {
           shapes.push(currentShape);
           currentShape = null;
@@ -202,7 +192,7 @@ The `importShape` and `reset` functions should be bound to the editor.
 
     const elements = shape.elements;
     for (var element of elements) {
-      const shape = fromJSON(element);
+      const shape = Shape.fromJSON(element);
       shapes.push(shape);
     }
 
@@ -213,7 +203,7 @@ The `importShape` and `reset` functions should be bound to the editor.
    * Resets the canvas.
    */
   export function reset() {
-    name = 'default';
+    name = "default";
     currentTool = Tool.SELECT;
     currentColor = DEFAULT_COLOR;
     editableColorIndex = 0;
@@ -223,12 +213,6 @@ The `importShape` and `reset` functions should be bound to the editor.
     currentShape = null;
   }
 </script>
-
-<style>
-  #canvas {
-    background-color: darkslategray;
-  }
-</style>
 
 <svg
   on:mousemove={handleMove}
@@ -273,3 +257,9 @@ The `importShape` and `reset` functions should be bound to the editor.
   </g>
   <slot />
 </svg>
+
+<style>
+  #canvas {
+    background-color: darkslategray;
+  }
+</style>

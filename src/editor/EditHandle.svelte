@@ -9,8 +9,7 @@ It listens to mouse events for user interaction and adjusts the position of a po
 @param grabbed - Indicates whether the handle is currently being dragged by the user. Should be bound.
 -->
 <script lang="ts">
-  import type { Shape } from './shape';
-  import { posToCoords } from './coords';
+  import { R2, Shape } from "./geometry";
 
   /**
    * The shape that the handle is part of.
@@ -36,7 +35,7 @@ It listens to mouse events for user interaction and adjusts the position of a po
 
   $: x = shape.points[index].x;
   $: y = shape.points[index].y;
-  $: cursor = grabbed ? 'grabbing' : 'grab';
+  $: cursor = grabbed ? "grabbing" : "grab";
 
   /**
    * Handles the mouse down event. Sets grabbed to true.
@@ -55,11 +54,7 @@ It listens to mouse events for user interaction and adjusts the position of a po
       return;
     }
 
-    // Update the shape point to the new mouse position
-    shape.points[index] = posToCoords(canvas, {
-      x: event.clientX,
-      y: event.clientY,
-    });
+    shape.points[index] = R2.fromMouse(canvas, event);
   }
 
   /**

@@ -9,9 +9,8 @@ It also changes the cursor style based on the current selected tool and shape.
 @param currentTool The current drawing tool being used.
 -->
 <script lang="ts">
-  import { JSONElementType } from './json';
-  import type { Shape } from './shape';
-  import { Tool } from './tool';
+  import { R2, Shape } from "./geometry";
+  import { Tool } from "./tool";
 
   /** The shape to be drawn. */
   export let shape: Shape;
@@ -26,16 +25,16 @@ It also changes the cursor style based on the current selected tool and shape.
   /** The stroke width of the SVG */
   $: strokeWidth = shape.filled ? 0 : 2;
   /** The fill color of the SVG */
-  $: fill = shape.filled ? shape.color : 'none';
+  $: fill = shape.filled ? shape.color : "none";
   /** The stroke color of the SVG */
-  $: strokeColor = shape.filled ? 'none' : shape.color;
+  $: strokeColor = shape.filled ? "none" : shape.color;
   /** The cursor style of the SVG */
   $: cursor =
     currentTool !== Tool.SELECT
-      ? 'crosshair'
+      ? "crosshair"
       : currentShape === shape
-      ? 'move'
-      : 'pointer';
+      ? "move"
+      : "pointer";
 
   /**
    * If the current tool is the selection tool, the current shape is set to this shape.
@@ -51,7 +50,7 @@ It also changes the cursor style based on the current selected tool and shape.
 
 <!-- repetitive because TypeScript doesn't like stuff like this :( -->
 <!-- svelte-ignore a11y-click-events-have-key-events -->
-{#if shape.type === JSONElementType.CIRCLE}
+{#if shape.type === Shape.Type.CIRCLE}
   <circle
     bind:this={svg}
     on:mousedown={handleClick}
@@ -60,13 +59,10 @@ It also changes the cursor style based on the current selected tool and shape.
     {fill}
     cx={shape.points[0].x}
     cy={shape.points[0].y}
-    r={Math.sqrt(
-      (shape.points[1].x - shape.points[0].x) ** 2 +
-        (shape.points[1].y - shape.points[0].y) ** 2,
-    )}
+    r={R2.l2(shape.points[0], shape.points[1])}
     {cursor}
   />
-{:else if shape.type === JSONElementType.LINE}
+{:else if shape.type === Shape.Type.LINE}
   <line
     bind:this={svg}
     on:mousedown={handleClick}
@@ -79,17 +75,17 @@ It also changes the cursor style based on the current selected tool and shape.
     y2={shape.points[1].y}
     {cursor}
   />
-{:else if shape.type === JSONElementType.POLYGON}
+{:else if shape.type === Shape.Type.POLYGON}
   <polygon
     bind:this={svg}
     on:mousedown={handleClick}
     stroke-width={strokeWidth}
     stroke={strokeColor}
     {fill}
-    points={shape.points.map((coord) => `${coord.x},${coord.y}`).join(' ')}
+    points={shape.points.map((coord) => `${coord.x},${coord.y}`).join(" ")}
     {cursor}
   />
-{:else if shape.type === JSONElementType.RECTANGLE}
+{:else if shape.type === Shape.Type.RECTANGLE}
   <rect
     bind:this={svg}
     on:mousedown={handleClick}
