@@ -10,7 +10,7 @@ If the selected tool is the selection tool, the current shape is also cleared.
 -->
 <script lang="ts">
   import type { Shape } from './geometry';
-  import { Tool } from './tool';
+  import { Tool } from './state';
 
   /** The current shape being manipulated. It is cleared when the selection tool is chosen. */
   export let currentShape: Shape | null = null;
@@ -29,6 +29,19 @@ If the selected tool is the selection tool, the current shape is also cleared.
     currentTool = tool;
   };
 </script>
+
+<style lang="scss">
+  @import './_variables.scss';
+  @import './_button.scss';
+
+  button {
+    border-right: $color2 1px solid;
+
+    &:first-child {
+      border-radius: $corner-radius 0 0 $corner-radius;
+    }
+  }
+</style>
 
 <button on:click={changeTool}>
   <slot />

@@ -6,6 +6,7 @@ import resolve from '@rollup/plugin-node-resolve';
 import livereload from 'rollup-plugin-livereload';
 import css from 'rollup-plugin-css-only';
 import typescript from 'rollup-plugin-typescript2';
+import scss from 'rollup-plugin-scss';
 
 const production = !process.env.ROLLUP_WATCH;
 
@@ -53,7 +54,7 @@ export default {
 			target: 'es2015', 
 			lib: ['es2015', 'dom'], 
 		  }),
-
+          scss({ output: 'public/build/bundle.css' }),
 		// If you have external dependencies installed from
 		// npm, you'll most likely need these plugins. In
 		// some cases you'll need additional configuration -

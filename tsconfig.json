@@ -8,7 +8,9 @@
       "module": "ES2015",
       "outDir": "./dist",
       "strict": true,
-      "esModuleInterop": true
+      "esModuleInterop": true,
+      "moduleResolution": "node",
+      "resolveJsonModule": true,
     },
     "exclude": [
       "node_modules",

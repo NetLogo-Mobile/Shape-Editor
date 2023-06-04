@@ -47,6 +47,19 @@ is maintained after the transformation (top-left corner remains at top-left).
   };
 </script>
 
+<style lang="scss">
+  @import './_variables.scss';
+  @import './_button.scss';
+
+  button {
+    border-left: $color2 1px solid;
+
+    &:last-child {
+      border-radius: 0 $corner-radius $corner-radius 0;
+    }
+  }
+</style>
+
 <button on:click={transformShapes}>
   <slot />
 </button>

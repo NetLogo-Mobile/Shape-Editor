@@ -10,7 +10,7 @@ It also changes the cursor style based on the current selected tool and shape.
 -->
 <script lang="ts">
   import { R2, Shape } from './geometry';
-  import { Tool } from './tool';
+  import { Tool } from './state';
 
   /** The shape to be drawn. */
   export let shape: Shape;

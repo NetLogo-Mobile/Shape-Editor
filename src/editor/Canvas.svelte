@@ -19,7 +19,7 @@ The `importShape` and `reset` functions should be bound to the editor.
   import EditHandle from './EditHandle.svelte';
   import SvgShape from './SVGShape.svelte';
   import type { JSONShape } from './json';
-  import { Tool } from './tool';
+  import { Tool } from './state';
   import { R2, Shape } from './geometry';
 
   const DEFAULT_COLOR = '#FFFFFF';
@@ -214,9 +214,15 @@ The `importShape` and `reset` functions should be bound to the editor.
   }
 </script>
 
-<style>
+<style lang="scss">
+  @import './_variables.scss';
+
   #canvas {
-    background-color: darkslategray;
+    width: $canvas-size;
+    height: $canvas-size;
+    background-color: black;
+    border-radius: $corner-radius;
+    margin: 2em;
   }
 </style>
 
@@ -230,14 +236,15 @@ The `importShape` and `reset` functions should be bound to the editor.
   viewBox="0 0 300 300"
   {cursor}
 >
-  <g id="grid" stroke="rgba(255, 255, 255, 0.1)" stroke-width="0.5">
-    {#each { length: 11 } as _, i}
-      <line x1={i * 30} y1="0" x2={i * 30} y2="300" />
+  <g id="grid" stroke="rgba(255, 255, 255, 0.3)" stroke-width="0.5">
+    {#each { length: 21 } as _, i}
+      <line x1={i * 15} y1="0" x2={i * 15} y2="300" />
     {/each}
-
-    {#each { length: 11 } as _, i}
-      <line x1="0" y1={i * 30} x2="300" y2={i * 30} />
+    <line x1="150" y1="0" x2="150" y2="300" />
+    {#each { length: 21 } as _, i}
+      <line x1="0" y1={i * 15} x2="300" y2={i * 15} />
     {/each}
+    <line x1="0" y1="150" x2="300" y2="150" />
   </g>
   <g id="shape">
     {#each shapes as shape}

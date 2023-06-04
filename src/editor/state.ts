@@ -80,7 +80,10 @@ export namespace State {
    * @param shapes The list of shapes.
    * @returns The list of shapes with the selected shape removed.
    */
-  export function remove(currentShape: Shape, shapes: Shape[]): [Shape | null, Shape[]] {
+  export function remove(
+    currentShape: Shape,
+    shapes: Shape[],
+  ): [Shape | null, Shape[]] {
     return [null, shapes.filter((shape) => shape !== currentShape)];
   }
 
@@ -90,8 +93,30 @@ export namespace State {
    * @param shapes The list of shapes.
    * @returns The list of shapes with the selected shape moved to the top.
    */
-  export function moveToTop(currentShape: Shape, shapes: Shape[]): [Shape | null, Shape[]] {
-    return [currentShape, shapes.filter((shape) => shape !== currentShape).concat(currentShape)];
+  export function moveToTop(
+    currentShape: Shape,
+    shapes: Shape[],
+  ): [Shape | null, Shape[]] {
+    return [
+      currentShape,
+      shapes.filter((shape) => shape !== currentShape).concat(currentShape),
+    ];
+  }
+
+  /**
+   * Moves the selected shape to the bottom of the list of shapes.
+   * @param currentShape The shape to move to the top.
+   * @param shapes The list of shapes.
+   * @returns The list of shapes with the selected shape moved to the top.
+   */
+  export function moveToBottom(
+    currentShape: Shape,
+    shapes: Shape[],
+  ): [Shape | null, Shape[]] {
+    return [
+      currentShape,
+      [currentShape].concat(shapes.filter((shape) => shape !== currentShape)),
+    ];
   }
 
   /**
@@ -100,8 +125,16 @@ export namespace State {
    * @param shapes The list of shapes.
    * @returns The list of shapes with the selected shape duplicated.
    */
-  export function duplicate(currentShape: Shape, shapes: Shape[]): [Shape | null, Shape[]] {
-    const newShape = new Shape(currentShape.points, currentShape.color, currentShape.type, currentShape.filled);
+  export function duplicate(
+    currentShape: Shape,
+    shapes: Shape[],
+  ): [Shape | null, Shape[]] {
+    const newShape = new Shape(
+      currentShape.points,
+      currentShape.color,
+      currentShape.type,
+      currentShape.filled,
+    );
     return [newShape, shapes.concat(newShape)];
   }
 }

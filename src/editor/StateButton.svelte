@@ -15,7 +15,10 @@ This component allows users to apply an operation to the shape stack.
    * @param shapes An array of shapes that will be transformed when the button is clicked.
    * @returns The new array of shapes.
    */
-  export let stateChange: (currentShape: Shape, shapes: Shape[]) => [Shape | null, Shape[]];
+  export let stateChange: (
+    currentShape: Shape,
+    shapes: Shape[],
+  ) => [Shape | null, Shape[]];
   /** An array of shapes that will be transformed when the button is clicked. */
   export let shapes: Shape[];
   /** The shape that is currently being edited. */
@@ -30,6 +33,21 @@ This component allows users to apply an operation to the shape stack.
     }
   };
 </script>
+
+<style lang="scss">
+  @import './_variables.scss';
+  @import './_button.scss';
+
+  button {
+    background: $color1;
+    border: 1px solid $color2;
+    box-shadow: 0px 2px 3px $shadow;
+    border-radius: $corner-radius;
+    width: 3em;
+    height: 3em;
+    margin: 0.5em;
+  }
+</style>
 
 <button on:click={transformState}>
   <slot />
