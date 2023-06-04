@@ -7,19 +7,20 @@ This component represents an editor for shapes drawn on the canvas.
 -->
 
 <script lang="ts">
-  import DrawButton from './DrawButton.svelte';
-  import { Tool } from './tool';
-  import Canvas from './Canvas.svelte';
-  import type { JSONShape } from './json';
-  import TransformButton from './TransformButton.svelte';
-  import { Shape, Transforms } from './geometry';
+  import DrawButton from "./DrawButton.svelte";
+  import { State, Tool } from "./tool";
+  import Canvas from "./Canvas.svelte";
+  import type { JSONShape } from "./json";
+  import TransformButton from "./TransformButton.svelte";
+  import { Shape, Transforms } from "./geometry";
+  import StateButton from "./StateButton.svelte";
 
   /** The name of the shape. */
-  let name: string = 'default';
+  let name: string = "default";
   /** The current tool being used. */
   let currentTool: Tool = Tool.SELECT;
   /** The current drawing color. */
-  let currentColor: string = '#FFFFFF';
+  let currentColor: string = "#FFFFFF";
   /** The editable color index. */
   let editableColorIndex: number = 0;
   /** Whether shapes should be rotatable. */
@@ -51,7 +52,7 @@ This component represents an editor for shapes drawn on the canvas.
     if (input) {
       canvasImport(input as JSONShape);
     }
-    const dialog: HTMLDialogElement = document.querySelector('#editor')!;
+    const dialog: HTMLDialogElement = document.querySelector("#editor")!;
     dialog.showModal();
   };
 
@@ -73,7 +74,7 @@ This component represents an editor for shapes drawn on the canvas.
   const close = () => {
     closeHook(toJSONShape());
     canvasReset();
-    const dialog: HTMLDialogElement = document.querySelector('#editor')!;
+    const dialog: HTMLDialogElement = document.querySelector("#editor")!;
     dialog.close();
   };
 </script>
@@ -81,8 +82,25 @@ This component represents an editor for shapes drawn on the canvas.
 <dialog id="editor">
   <h1 contenteditable="true" bind:textContent={name}>{name}</h1>
   <button on:click={close}>Close</button>
+  Color <input type="color" bind:value={currentColor} />
+  Color that changes <input type="color" />
+  Rotatable <input type="checkbox" bind:checked={rotate} />
+  <br />
+  <StateButton bind:currentShape bind:shapes stateChange={State.remove}
+    >Delete</StateButton
+  >
+  <StateButton bind:currentShape bind:shapes stateChange={State.moveToTop}
+    >Move to Top</StateButton
+  >
+  <StateButton bind:currentShape bind:shapes stateChange={State.duplicate}
+    >Duplicate</StateButton
+  >
+  <br />
   <DrawButton bind:currentShape bind:currentTool tool={Tool.SELECT}
-    >Select</DrawButton
+  >Select</DrawButton
+>
+  <DrawButton bind:currentShape bind:currentTool tool={Tool.LINE}
+    >Line</DrawButton
   >
   <DrawButton bind:currentShape bind:currentTool tool={Tool.RECTANGLE}
     >Rectangle</DrawButton
@@ -93,11 +111,39 @@ This component represents an editor for shapes drawn on the canvas.
   <DrawButton bind:currentShape bind:currentTool tool={Tool.POLYGON}
     >Polygon</DrawButton
   >
+  <br />
+  <DrawButton bind:currentShape bind:currentTool tool={Tool.FILLED_RECTANGLE}
+    >Filled Rectangle</DrawButton
+  >
+  <DrawButton bind:currentShape bind:currentTool tool={Tool.FILLED_CIRCLE}
+    >Filled Circle</DrawButton
+  >
+  <DrawButton bind:currentShape bind:currentTool tool={Tool.FILLED_POLYGON}
+    >Filled Polygon</DrawButton
+  >
+  <br />
   <TransformButton
     bind:currentShape
     bind:shapes
-    transformation={Transforms.rotateCCW}>Rotate CCW</TransformButton
+    transformation={Transforms.rotateCCW}
+    >Rotate Counterclockwise</TransformButton
   >
+  <TransformButton
+    bind:currentShape
+    bind:shapes
+    transformation={Transforms.rotateCW}>Rotate Clockwise</TransformButton
+  >
+  <TransformButton
+    bind:currentShape
+    bind:shapes
+    transformation={Transforms.flipHorizontal}>Flip Horizontal</TransformButton
+  >
+  <TransformButton
+    bind:currentShape
+    bind:shapes
+    transformation={Transforms.flipVertical}>Flip Vertical</TransformButton
+  >
+  <br />
   <Canvas
     bind:currentTool
     bind:currentColor

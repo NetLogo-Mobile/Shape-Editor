@@ -7,6 +7,7 @@ is maintained after the transformation (top-left corner remains at top-left).
 
 @component
 @param shapes An array of shapes that will be transformed when the button is clicked. Should be bound.
+@param currentShape The shape that is currently being edited. Should be bound.
 @param transformation A transformation function from R2 to R2.
 -->
 <script lang="ts">
@@ -20,6 +21,7 @@ is maintained after the transformation (top-left corner remains at top-left).
   export let transformation: (point: R2) => R2;
   /** An array of shapes that will be transformed when the button is clicked. */
   export let shapes: Shape[];
+  /** The shape that is currently being edited. */
   export let currentShape: Shape | null = null;
 
   /**
