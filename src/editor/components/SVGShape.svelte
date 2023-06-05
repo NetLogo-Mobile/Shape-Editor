@@ -16,6 +16,8 @@ It also changes the cursor style based on the current selected tool and shape.
   export let shape: Shape;
   /** The SVG element that represents the shape. */
   let svg: SVGElement;
+  /** The transform to display the element with. */
+  export let transform: string = "";
 
   /** The current shape being drawn or manipulated. */
   export let currentShape: Shape | null = null;
@@ -40,7 +42,7 @@ It also changes the cursor style based on the current selected tool and shape.
    * If the current tool is the selection tool, the current shape is set to this shape.
    * @param event The click event.
    */
-  export function handleClick(event: MouseEvent) {
+  function handleClick(event: MouseEvent) {
     if (currentTool !== Tool.SELECT) {
       return;
     }
@@ -67,6 +69,7 @@ It also changes the cursor style based on the current selected tool and shape.
     cx={shape.points[0].x}
     cy={shape.points[0].y}
     r={R2.l2(shape.points[0], shape.points[1])}
+    {transform}
     {cursor}
   />
 {:else if shape.type === Shape.Type.LINE}
@@ -80,6 +83,7 @@ It also changes the cursor style based on the current selected tool and shape.
     y1={shape.points[0].y}
     x2={shape.points[1].x}
     y2={shape.points[1].y}
+    {transform}
     {cursor}
   />
 {:else if shape.type === Shape.Type.POLYGON}
@@ -90,6 +94,7 @@ It also changes the cursor style based on the current selected tool and shape.
     stroke={strokeColor}
     {fill}
     points={shape.points.map((coord) => `${coord.x},${coord.y}`).join(' ')}
+    {transform}
     {cursor}
   />
 {:else if shape.type === Shape.Type.RECTANGLE}
@@ -103,6 +108,7 @@ It also changes the cursor style based on the current selected tool and shape.
     y={Math.min(shape.points[0].y, shape.points[1].y)}
     width={Math.abs(shape.points[1].x - shape.points[0].x)}
     height={Math.abs(shape.points[1].y - shape.points[0].y)}
+    {transform}
     {cursor}
   />
 {/if}

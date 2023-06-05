@@ -186,7 +186,7 @@ The `importShape` and `reset` functions should be bound to the editor.
   .canvas {
     width: $canvas-size;
     height: $canvas-size;
-    background-color: black;
+    background-color: $canvas-color;
     border-radius: $corner-radius;
     margin: 2em;
   }
