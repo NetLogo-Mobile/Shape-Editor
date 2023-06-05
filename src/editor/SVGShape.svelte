@@ -23,11 +23,11 @@ It also changes the cursor style based on the current selected tool and shape.
   export let currentTool: Tool = Tool.SELECT;
 
   /** The stroke width of the SVG */
-  $: strokeWidth = shape.filled ? 0 : 2;
+  $: strokeWidth = shape.filled ? 1 : 2;
   /** The fill color of the SVG */
   $: fill = shape.filled ? shape.color : 'none';
   /** The stroke color of the SVG */
-  $: strokeColor = shape.filled ? 'none' : shape.color;
+  $: strokeColor = shape.color;
   /** The cursor style of the SVG */
   $: cursor =
     currentTool !== Tool.SELECT
@@ -47,6 +47,13 @@ It also changes the cursor style based on the current selected tool and shape.
     currentShape = shape;
   }
 </script>
+
+<style>
+  * {
+    stroke-linejoin: round;
+    stroke-linecap: round;
+  }
+</style>
 
 <!-- repetitive because TypeScript doesn't like stuff like this :( -->
 <!-- svelte-ignore a11y-click-events-have-key-events -->

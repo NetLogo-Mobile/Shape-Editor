@@ -12,7 +12,7 @@ This component represents an editor for shapes drawn on the canvas.
   import Canvas from './Canvas.svelte';
   import type { JSONShape } from './json';
   import TransformButton from './TransformButton.svelte';
-  import { Shape, Transforms } from './geometry';
+  import { R2, Shape, Transforms } from './geometry';
   import StateButton from './StateButton.svelte';
 
   /** The name of the shape. */
@@ -30,6 +30,15 @@ This component represents an editor for shapes drawn on the canvas.
   let shapes: Shape[] = [];
   /** The current shape being drawn or manipulated. */
   let currentShape: Shape | null = null;
+
+  /** Whether the window is being moved. */
+  let moving: boolean = false;
+  /** Editor window. */
+  let editor: HTMLElement;
+  /** Grabbed location. */
+  let grabPos: R2;
+  /** Title bar element. */
+  let titleBar: HTMLElement;
 
   /**
    * Imports a shape from a JSON representation.
@@ -77,6 +86,25 @@ This component represents an editor for shapes drawn on the canvas.
     const dialog: HTMLDialogElement = document.querySelector('#editor')!;
     dialog.close();
   };
+
+  function handleTitleBarClick(event: MouseEvent) {
+    if (event.target === titleBar) {
+      moving = true;
+      grabPos = { x: event.clientX, y: event.clientY };
+    }
+  }
+
+  function handleTitleBarRelease(event: MouseEvent) {
+    moving = false;
+  }
+
+  function handleMouseMove(event: MouseEvent) {
+    if (moving) {
+      editor.style.left = `${editor.offsetLeft + event.clientX - grabPos.x}px`;
+      editor.style.top = `${editor.offsetTop + event.clientY - grabPos.y}px`;
+      grabPos = { x: event.clientX, y: event.clientY };
+    }
+  }
 </script>
 
 <style lang="scss">
@@ -90,6 +118,10 @@ This component represents an editor for shapes drawn on the canvas.
     box-shadow: 0px $corner-radius $corner-radius $shadow;
     font-size: 12px;
     padding: 0;
+    margin: 0;
+    position: absolute;
+    left: 3em;
+    top: 3em;
   }
 
   .title-bar {
@@ -124,6 +156,20 @@ This component represents an editor for shapes drawn on the canvas.
         height: 100%;
         margin: 0;
       }
+    }
+  }
+
+  .icon {
+    width: 1.5em;
+    height: 1.5em;
+    margin: 0;
+    align-self: center;
+
+    * {
+      stroke: $color6;
+      fill: $color6;
+      stroke-linejoin: round;
+      stroke-linecap: round;
     }
   }
 
@@ -175,11 +221,21 @@ This component represents an editor for shapes drawn on the canvas.
     border-width: 1px 0px 1px 1px;
     box-shadow: inset 2px $corner-radius $corner-radius $shadow;
     border-radius: $corner-radius 0px 0px $corner-radius;
+
+    div {
+      display: flex;
+      flex-direction: row;
+    }
   }
 </style>
 
-<dialog id="editor">
-  <div class="title-bar">
+<dialog bind:this={editor} on:mousemove={handleMouseMove} id="editor">
+  <div
+    bind:this={titleBar}
+    on:mousedown={handleTitleBarClick}
+    on:mouseup={handleTitleBarRelease}
+    class="title-bar"
+  >
     <b>Shape</b>
     <div>
       <p style="margin-right: 0.25em;">Name/</p>
@@ -190,12 +246,28 @@ This component represents an editor for shapes drawn on the canvas.
     <button on:click={close}>
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 8 8"
+        viewBox="0 0 16 16"
         width="100%"
         height="100%"
       >
-        <line x1="0" y1="0" x2="8" y2="8" stroke="white" />
-        <line x1="0" y1="8" x2="8" y2="0" stroke="white" />
+        <line
+          x1="1"
+          y1="1"
+          x2="15"
+          y2="15"
+          stroke="white"
+          stroke-linecap="round"
+          stroke-width="2"
+        />
+        <line
+          x1="1"
+          y1="15"
+          x2="15"
+          y2="1"
+          stroke="white"
+          stroke-linecap="round"
+          stroke-width="2"
+        />
       </svg>
     </button>
   </div>
@@ -204,57 +276,216 @@ This component represents an editor for shapes drawn on the canvas.
 
   <div class="tool-bar">
     <div>
-      <DrawButton bind:currentShape bind:currentTool tool={Tool.SELECT}
-        >S</DrawButton
-      >
-      <DrawButton bind:currentShape bind:currentTool tool={Tool.LINE}
-        >L</DrawButton
-      >
-      <DrawButton bind:currentShape bind:currentTool tool={Tool.RECTANGLE}
-        >R</DrawButton
-      >
+      <DrawButton bind:currentShape bind:currentTool tool={Tool.SELECT}>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 16 16"
+          class="icon"
+        >
+          <polygon points="4,15 8,10 14,10 4,1" />
+        </svg>
+      </DrawButton>
+      <DrawButton bind:currentShape bind:currentTool tool={Tool.LINE}>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 16 16"
+          class="icon"
+        >
+          <line x1="1" y1="1" x2="15" y2="15" />
+        </svg>
+      </DrawButton>
+      <DrawButton bind:currentShape bind:currentTool tool={Tool.RECTANGLE}>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 16 16"
+          class="icon"
+        >
+          <rect
+            x="1"
+            y="1"
+            rx="1"
+            ry="1"
+            width="14"
+            height="14"
+            fill-opacity="0"
+          />
+        </svg>
+      </DrawButton>
       <DrawButton
         bind:currentShape
         bind:currentTool
-        tool={Tool.FILLED_RECTANGLE}>FR</DrawButton
+        tool={Tool.FILLED_RECTANGLE}
       >
-      <DrawButton bind:currentShape bind:currentTool tool={Tool.CIRCLE}
-        >C</DrawButton
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 16 16"
+          class="icon"
+        >
+          <rect x="1" y="1" rx="1" ry="1" width="14" height="14" />
+        </svg>
+      </DrawButton>
+      <DrawButton bind:currentShape bind:currentTool tool={Tool.CIRCLE}>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 16 16"
+          class="icon"
+        >
+          <circle cx="8" cy="8" r="7" fill-opacity="0" />
+        </svg>
+      </DrawButton>
+      <DrawButton bind:currentShape bind:currentTool tool={Tool.FILLED_CIRCLE}>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 16 16"
+          class="icon"
+        >
+          <circle cx="8" cy="8" r="7" />
+        </svg></DrawButton
       >
-      <DrawButton bind:currentShape bind:currentTool tool={Tool.FILLED_CIRCLE}
-        >FC</DrawButton
-      >
-      <DrawButton bind:currentShape bind:currentTool tool={Tool.POLYGON}
-        >P</DrawButton
-      >
-      <DrawButton bind:currentShape bind:currentTool tool={Tool.FILLED_POLYGON}
-        >FP</DrawButton
-      >
+      <DrawButton bind:currentShape bind:currentTool tool={Tool.POLYGON}>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 16 16"
+          class="icon"
+        >
+          <polygon
+            points="1,8 4.5,14.0622 11.5,14.0622 15,8 11.5,1.9378 4.5,1.9378"
+            fill-opacity="0"
+          />
+        </svg>
+      </DrawButton>
+      <DrawButton bind:currentShape bind:currentTool tool={Tool.FILLED_POLYGON}>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 16 16"
+          class="icon"
+        >
+          <polygon
+            points="1,8 4.5,14.0622 11.5,14.0622 15,8 11.5,1.9378 4.5,1.9378"
+          />
+        </svg>
+      </DrawButton>
     </div>
     <div style="align-items: center;">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon"
+        ><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path
+          d="M512 256c0 .9 0 1.8 0 2.7c-.4 36.5-33.6 61.3-70.1 61.3H344c-26.5 0-48 21.5-48 48c0 3.4 .4 6.7 1 9.9c2.1 10.2 6.5 20 10.8 29.9c6.1 13.8 12.1 27.5 12.1 42c0 31.8-21.6 60.7-53.4 62c-3.5 .1-7 .2-10.6 .2C114.6 512 0 397.4 0 256S114.6 0 256 0S512 114.6 512 256zM128 288a32 32 0 1 0 -64 0 32 32 0 1 0 64 0zm0-96a32 32 0 1 0 0-64 32 32 0 1 0 0 64zM288 96a32 32 0 1 0 -64 0 32 32 0 1 0 64 0zm96 96a32 32 0 1 0 0-64 32 32 0 1 0 0 64z"
+        /></svg
+      >
+      <div style="width: 0.5em;" />
       <input type="color" bind:value={currentColor} />
     </div>
     <div>
       <TransformButton
         bind:currentShape
         bind:shapes
-        transformation={Transforms.rotateCCW}>CCW</TransformButton
+        transformation={Transforms.rotateCCW}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 16 16"
+          class="icon"
+        >
+          <defs>
+            <mask id="ccw-mask">
+              <rect
+                x="0"
+                y="0"
+                width="16"
+                height="16"
+                style="fill:white;"
+                stroke-opacity="0"
+              />
+              <polygon
+                points="0,0 0,16 8,8"
+                style="fill: black;"
+                stroke-opacity="0"
+              />
+            </mask>
+          </defs>
+
+          <circle cx="8" cy="8" r="7" fill-opacity="0" mask="url(#ccw-mask)" />
+          <polygon points="5,5 1,5 1,1" />
+        </svg>
+      </TransformButton>
+      <TransformButton
+        bind:currentShape
+        bind:shapes
+        transformation={Transforms.rotateCW}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 16 16"
+          class="icon"
+        >
+          <defs>
+            <mask id="cw-mask">
+              <rect
+                x="0"
+                y="0"
+                width="16"
+                height="16"
+                style="fill:white;"
+                stroke-opacity="0"
+              />
+              <polygon
+                points="16,0 16,16 8,8"
+                style="fill: black;"
+                stroke-opacity="0"
+              />
+            </mask>
+          </defs>
+
+          <circle cx="8" cy="8" r="7" fill-opacity="0" mask="url(#cw-mask)" />
+          <polygon points="11,5 15,5 15,1" />
+        </svg>
+      </TransformButton>
+      <TransformButton
+        bind:currentShape
+        bind:shapes
+        transformation={Transforms.flipHorizontal}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 16 16"
+          class="icon"
+        >
+          <rect y="3" x="1" width="5" height="10" rx="1" ry="1" />
+          <line y1="1" x1="8" y2="15" x2="8" />
+          <rect
+            y="3"
+            x="10"
+            width="5"
+            height="10"
+            rx="1"
+            ry="1"
+            fill-opacity="0"
+          />
+        </svg></TransformButton
       >
       <TransformButton
         bind:currentShape
         bind:shapes
-        transformation={Transforms.rotateCW}>CW</TransformButton
+        transformation={Transforms.flipVertical}
       >
-      <TransformButton
-        bind:currentShape
-        bind:shapes
-        transformation={Transforms.flipHorizontal}>H</TransformButton
-      >
-      <TransformButton
-        bind:currentShape
-        bind:shapes
-        transformation={Transforms.flipVertical}>V</TransformButton
-      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 16 16"
+          class="icon"
+        >
+          <rect x="3" y="1" width="10" height="5" rx="1" ry="1" />
+          <line x1="1" y1="8" x2="15" y2="8" />
+          <rect
+            x="3"
+            y="10"
+            width="10"
+            height="5"
+            rx="1"
+            ry="1"
+            fill-opacity="0"
+          />
+        </svg>
+      </TransformButton>
     </div>
   </div>
   <div class="middle">
@@ -275,33 +506,226 @@ This component represents an editor for shapes drawn on the canvas.
         <StateButton
           bind:currentShape
           bind:shapes
-          stateChange={(a, b) => [a, b]}>Undo</StateButton
+          stateChange={(a, b) => [a, b]}
         >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 16 16"
+            class="icon"
+          >
+            <defs>
+              <mask id="undo-mask">
+                <rect
+                  x="1"
+                  y="1"
+                  width="15"
+                  height="15"
+                  style="fill: white;"
+                  stroke-opacity="0"
+                />
+              </mask>
+            </defs>
+
+            <rect
+              x="-8"
+              y="8"
+              width="23"
+              height="23"
+              rx="2"
+              ry="2"
+              fill-opacity="0"
+              mask="url(#undo-mask)"
+            />
+            <polygon points="4,5 1,8 4,11" />
+          </svg>
+        </StateButton>
         <StateButton
           bind:currentShape
           bind:shapes
-          stateChange={(a, b) => [a, b]}>Redo</StateButton
+          stateChange={(a, b) => [a, b]}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 16 16"
+            class="icon"
+          >
+            <defs>
+              <mask id="redo-mask">
+                <rect
+                  x="0"
+                  y="1"
+                  width="15"
+                  height="15"
+                  style="fill: white;"
+                  stroke-opacity="0"
+                />
+              </mask>
+            </defs>
+
+            <rect
+              x="1"
+              y="8"
+              width="23"
+              height="23"
+              rx="2"
+              ry="2"
+              fill-opacity="0"
+              mask="url(#redo-mask)"
+            />
+            <polygon points="12,5 15,8 12,11" />
+          </svg></StateButton
         >
       </div>
       <div style="height: 3em;" />
       {#if currentShape && currentTool === Tool.SELECT}
-        <StateButton bind:currentShape bind:shapes stateChange={State.remove}
-          >X</StateButton
-        >
+        <StateButton bind:currentShape bind:shapes stateChange={State.remove}>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 16 16"
+            class="icon"
+          >
+            <polyline points="3,5 3,15 13,15 13,5" fill-opacity="0" />
+            <line x1="6" x2="6" y1="5" y2="13" />
+            <line x1="10" x2="10" y1="5" y2="13" />
+            <line x1="2" x2="14" y1="3" y2="3" />
+            <polyline points="5,3 5,1 11,1 11,3" fill-opacity="0" />
+          </svg>
+        </StateButton>
         <StateButton bind:currentShape bind:shapes stateChange={State.duplicate}
-          >C</StateButton
-        >
+          ><svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 16 16"
+            class="icon"
+          >
+            <defs>
+              <mask id="copy-mask">
+                <rect
+                  x="0"
+                  y="0"
+                  width="16"
+                  height="16"
+                  style="fill: white;"
+                  stroke-opacity="0"
+                />
+                <rect
+                  x="1"
+                  y="1"
+                  width="11"
+                  height="11"
+                  rx="2"
+                  ry="2"
+                  style="fill: black;"
+                  stroke-opacity="0"
+                />
+              </mask>
+            </defs>
+            <rect
+              x="4"
+              y="4"
+              width="11"
+              height="11"
+              rx="2"
+              ry="2"
+              fill-opacity="0"
+              mask="url(#copy-mask)"
+            />
+            <rect
+              x="1"
+              y="1"
+              width="11"
+              height="11"
+              rx="2"
+              ry="2"
+              fill-opacity="0"
+            />
+          </svg>
+        </StateButton>
         <div>
           <StateButton
             bind:currentShape
             bind:shapes
-            stateChange={State.moveToTop}>^</StateButton
+            stateChange={State.moveToTop}
           >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 16 16"
+              class="icon"
+            >
+              <defs>
+                <mask id="top-mask">
+                  <rect
+                    x="0"
+                    y="0"
+                    width="16"
+                    height="16"
+                    style="fill: white;"
+                    stroke-opacity="0"
+                  />
+                  <rect
+                    x="4"
+                    y="4"
+                    width="8"
+                    height="8"
+                    rx="2"
+                    ry="2"
+                    style="fill: black;"
+                    stroke-opacity="0"
+                  />
+                </mask>
+              </defs>
+
+              <rect
+                x="1"
+                y="1"
+                width="7"
+                height="7"
+                rx="2"
+                ry="2"
+                mask="url(#top-mask)"
+              />
+              <rect
+                x="8"
+                y="8"
+                width="7"
+                height="7"
+                rx="2"
+                ry="2"
+                mask="url(#top-mask)"
+              />
+              <rect
+                x="4"
+                y="4"
+                width="8"
+                height="8"
+                rx="2"
+                ry="2"
+                fill-opacity="0"
+              />
+            </svg>
+          </StateButton>
           <StateButton
             bind:currentShape
             bind:shapes
-            stateChange={State.moveToBottom}>v</StateButton
+            stateChange={State.moveToBottom}
           >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 16 16"
+              class="icon"
+            >
+              <rect
+                x="4"
+                y="4"
+                width="8"
+                height="8"
+                rx="2"
+                ry="2"
+                fill-opacity="0"
+              />
+              <rect x="1" y="1" width="7" height="7" rx="2" ry="2" />
+              <rect x="8" y="8" width="7" height="7" rx="2" ry="2" />
+            </svg>
+          </StateButton>
         </div>
       {:else}
         <div style="height: 4.75em;" />

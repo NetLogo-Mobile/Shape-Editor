@@ -58,7 +58,7 @@ The `importShape` and `reset` functions should be bound to the editor.
       ? 'crosshair'
       : grabbingHandle
       ? 'grabbed'
-      : grabbingShape
+      : grabbingShape && currentShape !== null
       ? 'move'
       : 'default';
 
