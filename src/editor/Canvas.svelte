@@ -217,7 +217,7 @@ The `importShape` and `reset` functions should be bound to the editor.
 <style lang="scss">
   @import './_variables.scss';
 
-  #canvas {
+  .canvas {
     width: $canvas-size;
     height: $canvas-size;
     background-color: black;
@@ -231,7 +231,7 @@ The `importShape` and `reset` functions should be bound to the editor.
   on:mousedown={handleClick}
   on:mouseup={handleRelease}
   bind:this={canvas}
-  id="canvas"
+  class="canvas"
   xmlns="http://www.w3.org/2000/svg"
   viewBox="0 0 300 300"
   {cursor}

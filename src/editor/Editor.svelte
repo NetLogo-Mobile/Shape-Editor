@@ -110,7 +110,7 @@ This component represents an editor for shapes drawn on the canvas.
 <style lang="scss">
   @import './_variables.scss';
 
-  #editor {
+  .editor {
     font-family: 'Lato';
     border-radius: $corner-radius;
     background: $color3;
@@ -229,7 +229,7 @@ This component represents an editor for shapes drawn on the canvas.
   }
 </style>
 
-<dialog bind:this={editor} on:mousemove={handleMouseMove} id="editor">
+<dialog bind:this={editor} on:mousemove={handleMouseMove} class="editor">
   <div
     bind:this={titleBar}
     on:mousedown={handleTitleBarClick}
