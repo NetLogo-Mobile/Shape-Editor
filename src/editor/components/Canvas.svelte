@@ -18,26 +18,21 @@ The `importShape` and `reset` functions should be bound to the editor.
 <script lang="ts">
   import EditHandle from './EditHandle.svelte';
   import SvgShape from './SVGShape.svelte';
-  import type { JSONShape } from './json';
-  import { Tool } from './state';
-  import { R2, Shape } from './geometry';
+  import { Tool } from '../utils/state';
+  import { R2, Shape } from '../utils/geometry';
 
   const DEFAULT_COLOR = '#FFFFFF';
 
-  /** The name of the shape. */
-  export let name: string = 'default';
   /** The current tool being used. */
   export let currentTool: Tool = Tool.SELECT;
   /** The current drawing color. */
   export let currentColor: string = DEFAULT_COLOR;
-  /** The editable color index. */
-  export let editableColorIndex: number = 0;
-  /** Whether shapes should be rotatable. */
-  export let rotate: boolean = true;
   /** The current shape being drawn or manipulated. */
   export let currentShape: Shape | null = null;
   /** The array of shapes on the canvas. */
   export let shapes: Shape[] = [];
+  /** A function to update the state. */
+  export let pushState: () => void;
 
   /** The canvas element. */
   let canvas: Element;
@@ -157,6 +152,7 @@ The `importShape` and `reset` functions should be bound to the editor.
           currentShape.points.length == 2 &&
           Tool.shapeType(currentTool) != Shape.Type.POLYGON
         ) {
+          pushState();
           shapes.push(currentShape);
           currentShape = null;
         } else {
@@ -168,6 +164,7 @@ The `importShape` and `reset` functions should be bound to the editor.
             lastCoord.y == lastLastCoord.y
           ) {
             currentShape.points.pop();
+            pushState();
             shapes.push(currentShape);
             currentShape = null;
           } else {
@@ -176,46 +173,15 @@ The `importShape` and `reset` functions should be bound to the editor.
         }
       }
     } else {
+      pushState();
       grabbingShape = true;
       grabPos = coords;
     }
   }
-
-  /**
-   * Imports a shape into the canvas.
-   * @param shape The shape to import.
-   */
-  export function importShape(shape: JSONShape) {
-    name = shape.name;
-    editableColorIndex = shape.editableColorIndex;
-    rotate = shape.rotate;
-
-    const elements = shape.elements;
-    for (var element of elements) {
-      const shape = Shape.fromJSON(element);
-      shapes.push(shape);
-    }
-
-    shapes = shapes;
-  }
-
-  /**
-   * Resets the canvas.
-   */
-  export function reset() {
-    name = 'default';
-    currentTool = Tool.SELECT;
-    currentColor = DEFAULT_COLOR;
-    editableColorIndex = 0;
-    rotate = true;
-
-    shapes = [];
-    currentShape = null;
-  }
 </script>
 
 <style lang="scss">
-  @import './_variables.scss';
+  @import '../style/variables.scss';
 
   .canvas {
     width: $canvas-size;
@@ -263,6 +229,7 @@ The `importShape` and `reset` functions should be bound to the editor.
           bind:grabbed={handlesGrabbed[i]}
           bind:canvas
           bind:shape={currentShape}
+          {pushState}
           index={i}
         />
       {/each}

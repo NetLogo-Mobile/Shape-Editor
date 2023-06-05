@@ -1,4 +1,4 @@
-import { Shape } from './geometry';
+import { R2, Shape } from './geometry';
 
 /**
  * Enum representing the set of available tools.
@@ -136,5 +136,37 @@ export namespace State {
       currentShape.filled,
     );
     return [newShape, shapes.concat(newShape)];
+  }
+}
+
+export namespace History {
+  /**
+   * Undo the last action.
+   * @param undoStack The list of previous states.
+   * @param redoStack The list of undone states.
+   * @returns The updated undo stack, the updated redo stack, and the new current state.
+   */
+  export function undo(undoStack: Shape[][], redoStack: Shape[][], shapes: Shape[]): [Shape[][], Shape[][], Shape[]] {
+    if (undoStack.length === 0) {
+      return [undoStack, redoStack, shapes];
+    }
+
+    redoStack.push(shapes);
+    return [undoStack, redoStack, undoStack.pop()!];
+  }
+
+  /**
+   * Redo the last undo.
+   * @param undoStack The list of previous states.
+   * @param redoStack The list of undone states.
+   * @returns The updated undo stack, the updated redo stack, and the new current state.
+   */
+  export function redo(undoStack: Shape[][], redoStack: Shape[][], shapes: Shape[]): [Shape[][], Shape[][], Shape[]] {
+    if (redoStack.length === 0) {
+      return [undoStack, redoStack, shapes];
+    }
+
+    undoStack.push(shapes);
+    return [undoStack, redoStack, redoStack.pop()!];
   }
 }

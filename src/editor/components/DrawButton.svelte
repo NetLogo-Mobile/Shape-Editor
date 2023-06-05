@@ -9,8 +9,8 @@ If the selected tool is the selection tool, the current shape is also cleared.
 @param currentTool The current drawing tool. Should be bound.
 -->
 <script lang="ts">
-  import type { Shape } from './geometry';
-  import { Tool } from './state';
+  import type { Shape } from '../utils/geometry';
+  import { Tool } from '../utils/state';
 
   /** The current shape being manipulated. It is cleared when the selection tool is chosen. */
   export let currentShape: Shape | null = null;
@@ -31,8 +31,8 @@ If the selected tool is the selection tool, the current shape is also cleared.
 </script>
 
 <style lang="scss">
-  @import './_variables.scss';
-  @import './_button.scss';
+  @import '../style/variables.scss';
+  @import '../style/button.scss';
 
   button {
     border-right: $color2 1px solid;

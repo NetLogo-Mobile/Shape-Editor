@@ -7,20 +7,24 @@ This component represents an editor for shapes drawn on the canvas.
 -->
 
 <script lang="ts">
-  import DrawButton from './DrawButton.svelte';
-  import { State, Tool } from './state';
-  import Canvas from './Canvas.svelte';
-  import type { JSONShape } from './json';
-  import TransformButton from './TransformButton.svelte';
-  import { R2, Shape, Transforms } from './geometry';
-  import StateButton from './StateButton.svelte';
+  import DrawButton from './components/DrawButton.svelte';
+  import { History, State, Tool } from './utils/state';
+  import Canvas from './components/Canvas.svelte';
+  import type { JSONShape } from './utils/json';
+  import TransformButton from './components/TransformButton.svelte';
+  import { R2, Shape, Transforms } from './utils/geometry';
+  import StateButton from './components/StateButton.svelte';
+  import HistoryButton from './components/HistoryButton.svelte';
+
+
+  const DEFAULT_COLOR = '#ffffff';
 
   /** The name of the shape. */
   let name: string = 'default';
   /** The current tool being used. */
   let currentTool: Tool = Tool.SELECT;
   /** The current drawing color. */
-  let currentColor: string = '#FFFFFF';
+  let currentColor: string = DEFAULT_COLOR;
   /** The editable color index. */
   let editableColorIndex: number = 0;
   /** Whether shapes should be rotatable. */
@@ -30,23 +34,66 @@ This component represents an editor for shapes drawn on the canvas.
   let shapes: Shape[] = [];
   /** The current shape being drawn or manipulated. */
   let currentShape: Shape | null = null;
+  /** The list of previous states. */
+  let undoStack: Shape[][] = [];
+  /** The list of undone states. */
+  let redoStack: Shape[][] = [];
 
   /** Whether the window is being moved. */
   let moving: boolean = false;
   /** Editor window. */
-  let editor: HTMLElement;
+  let editor: HTMLDialogElement;
   /** Grabbed location. */
   let grabPos: R2;
   /** Title bar element. */
   let titleBar: HTMLElement;
 
   /**
-   * Imports a shape from a JSON representation.
+   * Pushes the current state to the undo stack.
+   * 
+   * @remarks
+   * Could be handled more efficiently by only pushing the difference.
+   */
+  const pushState = () => {
+    const state = structuredClone(shapes);
+    if (JSON.stringify(state) != JSON.stringify(undoStack.at(-1))) {
+      undoStack.push(state);
+      redoStack = [];
+    }
+  };
+
+  /**
+   * Resets the editor.
+   */
+  const resetShape = () => {
+    name = 'default';
+    currentTool = Tool.SELECT;
+    currentColor = DEFAULT_COLOR;
+    editableColorIndex = 0;
+    rotate = true;
+
+    shapes = [];
+    currentShape = null;
+    undoStack = [];
+    redoStack = [];
+  }
+
+  /**
+   * Imports a shape into the editor.
    * @param shape The shape to import.
    */
-  let canvasImport: (shape: JSONShape) => void;
-  /** Resets the canvas. */
-  let canvasReset: () => void;
+  const importShape = (shape: JSONShape) => {
+    name = shape.name;
+    editableColorIndex = shape.editableColorIndex;
+    rotate = shape.rotate;
+
+    for (var element of shape.elements) {
+      shapes.push(Shape.fromJSON(element));
+    }
+
+    shapes = shapes;
+  }
+
   /**
    * Hook for closing the editor.
    * @param shape The JSON representation of the shape on the canvas.
@@ -59,10 +106,9 @@ This component represents an editor for shapes drawn on the canvas.
    */
   export const open = (input?: JSONShape) => {
     if (input) {
-      canvasImport(input as JSONShape);
+      importShape(input as JSONShape);
     }
-    const dialog: HTMLDialogElement = document.querySelector('#editor')!;
-    dialog.showModal();
+    editor.showModal();
   };
 
   /**
@@ -71,7 +117,7 @@ This component represents an editor for shapes drawn on the canvas.
   const toJSONShape: () => JSONShape = () => {
     return {
       name: name,
-      elements: shapes.map((shape) => shape.toJSON()),
+      elements: shapes.map((shape) => Shape.toJSON(shape)),
       editableColorIndex: editableColorIndex,
       rotate: rotate,
     };
@@ -82,11 +128,14 @@ This component represents an editor for shapes drawn on the canvas.
    */
   const close = () => {
     closeHook(toJSONShape());
-    canvasReset();
-    const dialog: HTMLDialogElement = document.querySelector('#editor')!;
-    dialog.close();
+    resetShape();
+    editor.close();
   };
 
+  /**
+   * Handles clicking the title bar.
+   * @param event The mouse event.
+   */
   function handleTitleBarClick(event: MouseEvent) {
     if (event.target === titleBar) {
       moving = true;
@@ -94,10 +143,18 @@ This component represents an editor for shapes drawn on the canvas.
     }
   }
 
+  /**
+   * Handles releasing the title bar.
+   * @param event The mouse event.
+   */
   function handleTitleBarRelease(event: MouseEvent) {
     moving = false;
   }
 
+  /**
+   * Handles moving the title bar.
+   * @param event The mouse event.
+   */
   function handleMouseMove(event: MouseEvent) {
     if (moving) {
       editor.style.left = `${editor.offsetLeft + event.clientX - grabPos.x}px`;
@@ -108,7 +165,7 @@ This component represents an editor for shapes drawn on the canvas.
 </script>
 
 <style lang="scss">
-  @import './_variables.scss';
+  @import './style/variables.scss';
 
   .editor {
     font-family: 'Lato';
@@ -380,6 +437,7 @@ This component represents an editor for shapes drawn on the canvas.
         bind:currentShape
         bind:shapes
         transformation={Transforms.rotateCCW}
+        {pushState}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -412,6 +470,7 @@ This component represents an editor for shapes drawn on the canvas.
         bind:currentShape
         bind:shapes
         transformation={Transforms.rotateCW}
+        {pushState}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -444,6 +503,7 @@ This component represents an editor for shapes drawn on the canvas.
         bind:currentShape
         bind:shapes
         transformation={Transforms.flipHorizontal}
+        {pushState}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -467,6 +527,7 @@ This component represents an editor for shapes drawn on the canvas.
         bind:currentShape
         bind:shapes
         transformation={Transforms.flipVertical}
+        {pushState}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -493,20 +554,18 @@ This component represents an editor for shapes drawn on the canvas.
     <Canvas
       bind:currentTool
       bind:currentColor
-      bind:editableColorIndex
-      bind:name
-      bind:rotate
       bind:shapes
       bind:currentShape
-      bind:importShape={canvasImport}
-      bind:reset={canvasReset}
+      {pushState}
     />
     <div class="tool-tray-right">
       <div>
-        <StateButton
-          bind:currentShape
+        <HistoryButton
+          bind:undoStack
+          bind:redoStack
           bind:shapes
-          stateChange={(a, b) => [a, b]}
+          bind:currentShape
+          historyChange={History.undo}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -538,11 +597,13 @@ This component represents an editor for shapes drawn on the canvas.
             />
             <polygon points="4,5 1,8 4,11" />
           </svg>
-        </StateButton>
-        <StateButton
-          bind:currentShape
+        </HistoryButton>
+        <HistoryButton
+          bind:undoStack
+          bind:redoStack
           bind:shapes
-          stateChange={(a, b) => [a, b]}
+          bind:currentShape
+          historyChange={History.redo}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -573,12 +634,12 @@ This component represents an editor for shapes drawn on the canvas.
               mask="url(#redo-mask)"
             />
             <polygon points="12,5 15,8 12,11" />
-          </svg></StateButton
+          </svg></HistoryButton
         >
       </div>
       <div style="height: 3em;" />
       {#if currentShape && currentTool === Tool.SELECT}
-        <StateButton bind:currentShape bind:shapes stateChange={State.remove}>
+        <StateButton bind:currentShape bind:shapes stateChange={State.remove} {pushState}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 16 16"
@@ -591,7 +652,7 @@ This component represents an editor for shapes drawn on the canvas.
             <polyline points="5,3 5,1 11,1 11,3" fill-opacity="0" />
           </svg>
         </StateButton>
-        <StateButton bind:currentShape bind:shapes stateChange={State.duplicate}
+        <StateButton bind:currentShape bind:shapes stateChange={State.duplicate} {pushState}
           ><svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 16 16"
@@ -645,6 +706,7 @@ This component represents an editor for shapes drawn on the canvas.
             bind:currentShape
             bind:shapes
             stateChange={State.moveToTop}
+            {pushState}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -707,6 +769,7 @@ This component represents an editor for shapes drawn on the canvas.
             bind:currentShape
             bind:shapes
             stateChange={State.moveToBottom}
+            {pushState}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

@@ -9,8 +9,8 @@ It also changes the cursor style based on the current selected tool and shape.
 @param currentTool The current drawing tool being used.
 -->
 <script lang="ts">
-  import { R2, Shape } from './geometry';
-  import { Tool } from './state';
+  import { R2, Shape } from '../utils/geometry';
+  import { Tool } from '../utils/state';
 
   /** The shape to be drawn. */
   export let shape: Shape;
@@ -40,7 +40,7 @@ It also changes the cursor style based on the current selected tool and shape.
    * If the current tool is the selection tool, the current shape is set to this shape.
    * @param event The click event.
    */
-  function handleClick(event: MouseEvent) {
+  export function handleClick(event: MouseEvent) {
     if (currentTool !== Tool.SELECT) {
       return;
     }

@@ -9,6 +9,8 @@ import {
 
 /** A constant used to scale the canvas size. */
 export const SCALE = 300;
+/** A constant used to round coordinates. */
+export const PRECISION = 100;
 
 /**
  * Represents a 2D point in the Cartesian coordinate system.
@@ -36,8 +38,8 @@ export namespace R2 {
     const rect: DOMRect = canvas.getBoundingClientRect();
 
     return {
-      x: (SCALE * (event.clientX - rect.left)) / rect.width,
-      y: (SCALE * (event.clientY - rect.top)) / rect.height,
+      x: Math.round(PRECISION * SCALE * (event.clientX - rect.left) / rect.width) / PRECISION,
+      y: Math.round(PRECISION * SCALE * (event.clientY - rect.top) / rect.height) / PRECISION,
     };
   }
 
@@ -48,7 +50,7 @@ export namespace R2 {
    * @returns The distance between the two points.
    */
   export function l2(p1: R2, p2: R2): number {
-    return Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2);
+    return Math.round(PRECISION * Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2)) / PRECISION;
   }
 }
 
@@ -120,44 +122,51 @@ export class Shape {
    * @param this - The Shape to be converted.
    * @returns The corresponding JSONElement.
    */
-  toJSON(): JSONElement {
+  static toJSON(shape: Shape): JSONElement {
     let common: JSONBaseElement = {
-      type: this.type,
-      color: this.color,
-      filled: this.filled,
+      type: shape.type,
+      color: shape.color,
+      filled: shape.filled,
       marked: false,
     };
 
-    switch (this.type) {
+    shape.points = shape.points.map((point) => {
+      return {
+        x: Math.round(PRECISION * point.x) / PRECISION,
+        y: Math.round(PRECISION * point.y) / PRECISION,
+      }
+    });
+
+    switch (shape.type) {
       case Shape.Type.LINE:
         return {
           ...common,
-          x1: this.points[0].x,
-          y1: this.points[0].y,
-          x2: this.points[1].x,
-          y2: this.points[1].y,
+          x1: shape.points[0].x,
+          y1: shape.points[0].y,
+          x2: shape.points[1].x,
+          y2: shape.points[1].y,
         };
       case Shape.Type.CIRCLE:
-        const radius = R2.l2(this.points[0], this.points[1]);
+        const radius = R2.l2(shape.points[0], shape.points[1]);
         return {
           ...common,
-          x: this.points[0].x + radius,
-          y: this.points[0].y + radius,
+          x: shape.points[0].x + radius,
+          y: shape.points[0].y + radius,
           diam: radius * 2,
         };
       case Shape.Type.RECTANGLE:
         return {
           ...common,
-          xmin: Math.min(this.points[0].x, this.points[1].x),
-          ymin: Math.min(this.points[0].y, this.points[1].y),
-          xmax: Math.max(this.points[0].x, this.points[1].x),
-          ymax: Math.max(this.points[0].y, this.points[1].y),
+          xmin: Math.min(shape.points[0].x, shape.points[1].x),
+          ymin: Math.min(shape.points[0].y, shape.points[1].y),
+          xmax: Math.max(shape.points[0].x, shape.points[1].x),
+          ymax: Math.max(shape.points[0].y, shape.points[1].y),
         };
       case Shape.Type.POLYGON:
         return {
           ...common,
-          xcors: this.points.map((point) => point.x),
-          ycors: this.points.map((point) => point.y),
+          xcors: shape.points.map((point) => point.x),
+          ycors: shape.points.map((point) => point.y),
         };
     }
   }

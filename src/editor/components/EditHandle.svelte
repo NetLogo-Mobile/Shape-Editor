@@ -9,7 +9,7 @@ It listens to mouse events for user interaction and adjusts the position of a po
 @param grabbed - Indicates whether the handle is currently being dragged by the user. Should be bound.
 -->
 <script lang="ts">
-  import { R2, Shape } from './geometry';
+  import { R2, Shape } from "../utils/geometry";
 
   /**
    * The shape that the handle is part of.
@@ -31,17 +31,21 @@ It listens to mouse events for user interaction and adjusts the position of a po
    */
   export let grabbed = false;
 
+  /** A function to update the state. */
+  export let pushState: () => void;
+
   const WIDTH = 6;
 
   $: x = shape.points[index].x;
   $: y = shape.points[index].y;
-  $: cursor = grabbed ? 'grabbing' : 'grab';
+  $: cursor = grabbed ? "grabbing" : "grab";
 
   /**
    * Handles the mouse down event. Sets grabbed to true.
    * @param event - The mouse event.
    */
   function handleClick(event: MouseEvent) {
+    pushState();
     grabbed = true;
   }
 

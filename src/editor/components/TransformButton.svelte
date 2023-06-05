@@ -11,7 +11,7 @@ is maintained after the transformation (top-left corner remains at top-left).
 @param transformation A transformation function from R2 to R2.
 -->
 <script lang="ts">
-  import type { R2, Shape } from './geometry';
+  import type { R2, Shape } from "../utils/geometry";
 
   /**
    * A transformation function from R2 to R2.
@@ -23,6 +23,8 @@ is maintained after the transformation (top-left corner remains at top-left).
   export let shapes: Shape[];
   /** The shape that is currently being edited. */
   export let currentShape: Shape | null = null;
+  /** A function to update the state. */
+  export let pushState: () => void;
 
   /**
    * Apply the transformation to a single shape.
@@ -36,6 +38,7 @@ is maintained after the transformation (top-left corner remains at top-left).
    * Apply the transformation to all shapes.
    */
   const transformShapes = () => {
+    pushState();
     if (currentShape !== null) {
       transformShape(currentShape);
       currentShape = currentShape;
@@ -47,9 +50,13 @@ is maintained after the transformation (top-left corner remains at top-left).
   };
 </script>
 
+<button on:click={transformShapes}>
+  <slot />
+</button>
+
 <style lang="scss">
-  @import './_variables.scss';
-  @import './_button.scss';
+  @import "../style/variables.scss";
+  @import "../style/button.scss";
 
   button {
     border-left: $color2 1px solid;
@@ -59,7 +66,3 @@ is maintained after the transformation (top-left corner remains at top-left).
     }
   }
 </style>
-
-<button on:click={transformShapes}>
-  <slot />
-</button>
