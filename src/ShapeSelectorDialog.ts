@@ -7,7 +7,7 @@ export class GalapagosShapeSelectorDialog {
 
   // dialog open state
   dialogOpen: boolean;
-  
+
   // Array of all shapes to display
   shapes: Shape[] = [];
 
@@ -23,6 +23,9 @@ export class GalapagosShapeSelectorDialog {
   // The ID of the currently selected shape
   selectedItemId: number | null = null;
 
+  // the ID of the recently imported shape
+  recentlyImportedShapeId: number | null = null;
+
   // Config object containing callback functions to update the main app state
   config: GalapagosShapeSelectorDialogConfig;
 
@@ -32,20 +35,59 @@ export class GalapagosShapeSelectorDialog {
   // Boolean to track if the library has been opened
   libraryOpen: boolean;
 
-  constructor(
-    parent: HTMLElement, 
-    config: GalapagosShapeSelectorDialogConfig
-  ) {
+  constructor(parent: HTMLElement, config: GalapagosShapeSelectorDialogConfig) {
     // Initialize all fields
     this.parent = parent;
     // shapes array is initialized with default shapes, should be imported from json in the future
     this.shapes = [
-      { id: 1, name: 'default', image: 'shapes/down-arrow.png', type: 'turtle', hover: false, deletable: false},
-      { id: 2, name: 'apple', image: 'shapes/down-arrow.png', type: 'turtle', hover: false, deletable: true },
-      { id: 3, name: 'banana', image: 'shapes/down-arrow.png', type: 'turtle', hover: false, deletable: true },
-      { id: 4, name: 'peach', image: 'shapes/down-arrow.png', type: 'turtle' , hover: false, deletable: true},
-      { id: 5, name: 'down-arrow', image: 'shapes/down-arrow.png', type: 'link' , hover: false, deletable: true},
-      { id: 6, name: 'down-arrow', image: 'shapes/down-arrow.png', type: 'link', hover: false , deletable: true},
+      {
+        id: 1,
+        name: 'default',
+        image: 'shapes/down-arrow.png',
+        type: 'turtle',
+        hover: false,
+        deletable: false,
+      },
+      {
+        id: 2,
+        name: 'apple',
+        image: 'shapes/down-arrow.png',
+        type: 'turtle',
+        hover: false,
+        deletable: true,
+      },
+      {
+        id: 3,
+        name: 'banana',
+        image: 'shapes/down-arrow.png',
+        type: 'turtle',
+        hover: false,
+        deletable: true,
+      },
+      {
+        id: 4,
+        name: 'peach',
+        image: 'shapes/down-arrow.png',
+        type: 'turtle',
+        hover: false,
+        deletable: true,
+      },
+      {
+        id: 5,
+        name: 'down-arrow',
+        image: 'shapes/down-arrow.png',
+        type: 'link',
+        hover: false,
+        deletable: true,
+      },
+      {
+        id: 6,
+        name: 'down-arrow',
+        image: 'shapes/down-arrow.png',
+        type: 'link',
+        hover: false,
+        deletable: true,
+      },
     ];
     this.searchTerm = '';
     this.filteredShapes = this.shapes;
@@ -71,9 +113,9 @@ export class GalapagosShapeSelectorDialog {
     this.config.onUpdateImportButtonSelected(this.importButtonSelected);
   }
 
-  // 
+  //
   closeLibrary() {
-    console.log('close library')
+    console.log('close library');
     this.libraryOpen = false;
     this.config.onUpdateLibraryOpen(this.libraryOpen);
   }
@@ -128,18 +170,17 @@ export class GalapagosShapeSelectorDialog {
         }
         let newInsertIndex = insertIndex;
         if (existingIndices.length >= 1) {
-          let maxIndex = Math.max(...existingIndices);
+          const maxIndex = Math.max(...existingIndices);
           for (let i = 0; i < this.shapes.length; i++) {
-            if (
-              this.shapes[i].name ===
-              `${baseName} ${maxIndex}`
-            ) {
+            if (this.shapes[i].name === `${baseName} ${maxIndex}`) {
               newInsertIndex = i;
               break;
             }
           }
         }
-        const newIndex = existingIndices.length ? Math.max(...existingIndices) + 1 : 1;
+        const newIndex = existingIndices.length
+          ? Math.max(...existingIndices) + 1
+          : 1;
         const newName = `${baseName} ${newIndex}`;
         const duplicatedShape = {
           ...shapeToDuplicate,
@@ -157,7 +198,7 @@ export class GalapagosShapeSelectorDialog {
       }
     }
   }
-  
+
   // function to handle adding a shape
   addNewShape(shape: Shape) {
     // make the shape the next available id and set the type to the current type
@@ -180,7 +221,10 @@ export class GalapagosShapeSelectorDialog {
     // insert shape by alphabetical order after the defaults
     let insertIndex = -1;
     for (let i = 0; i < this.shapes.length; i++) {
-      if (this.shapes[i].name != 'default' && this.shapes[i].name > shape.name) {
+      if (
+        this.shapes[i].name != 'default' &&
+        this.shapes[i].name > shape.name
+      ) {
         insertIndex = i;
         break;
       }
@@ -193,7 +237,8 @@ export class GalapagosShapeSelectorDialog {
     this.shapes = [...this.shapes];
     this.config.onUpdateShapes(this.shapes);
     this.selectedItemId = shape.id;
-    this.config.onUpdateSelectedItemId(this.selectedItemId);
+    this.recentlyImportedShapeId = shape.id;
+    this.config.onUpdateRecentlyImportedShape(this.recentlyImportedShapeId);
     this.filterShapes(this.currentType);
   }
 
@@ -206,7 +251,7 @@ export class GalapagosShapeSelectorDialog {
         break;
       }
     }
-  
+
     if (shapeIndexToDelete !== -1) {
       this.shapes.splice(shapeIndexToDelete, 1);
       this.shapes = [...this.shapes];
@@ -215,7 +260,7 @@ export class GalapagosShapeSelectorDialog {
       this.config.onUpdateFilteredShapes(this.filteredShapes);
     }
   }
-  
+
   // function to filter shapes when type filter changes
   filterShapes(type: string) {
     this.currentType = type;
@@ -248,7 +293,8 @@ export class GalapagosShapeSelectorDialog {
     }
     // console log this information in selected shape
     console.log(this.shapes.find((shape) => shape.id === this.selectedItemId));
+    this.recentlyImportedShapeId = null;
+    this.config.onUpdateRecentlyImportedShape(this.recentlyImportedShapeId);
     this.config.onUpdateSelectedItemId(this.selectedItemId);
   }
 }
-

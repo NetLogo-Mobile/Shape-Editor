@@ -5,16 +5,18 @@
   import { writable } from 'svelte/store';
   import { fade } from 'svelte/transition';
 
-  // your other TypeScript code...
-
+  // dom elements
   let dialog;
   let header;
+  let container;
+
   let ShapeSelectorDialog;
   let searchTerm;
   let currentType;
   let filteredShapes = [];
   let shapes = [];
   let selectedItemId = null;
+  let recentlyImportedShapeId = null;
   let dialogOpen = true;
   let importButtonSelected = false;
   let libraryOpen = false;
@@ -25,6 +27,7 @@
   const shapesStore = writable([]);
   const filteredShapesStore = writable([]);
   const selectedItemIdStore = writable(null);
+  const recentlyImportedShapeIdStore = writable(null);
   const dialogOpenStore = writable(true);
   const importButtonSelectedStore = writable(false);
   const libraryOpenStore = writable(false);
@@ -50,6 +53,9 @@
       },
       onUpdateLibraryOpen: (newLibraryOpen) => {
         libraryOpenStore.set(newLibraryOpen);
+      },
+      onUpdateRecentlyImportedShape: (newRecentlyImportedShapeId) => {
+        recentlyImportedShapeIdStore.set(newRecentlyImportedShapeId);
       },
     };
 
@@ -103,6 +109,19 @@
     );
   });
 
+  // scroll into view function
+  function scrollContainerIntoView(node, newlyAdded) {
+    if (newlyAdded) {
+      let relativeTop = node.offsetTop - container.offsetTop;
+      if (
+        relativeTop < container.scrollTop ||
+        relativeTop > container.scrollTop + container.offsetHeight
+      ) {
+        container.scrollTop = relativeTop;
+      }
+    }
+  }
+
   // Subscribe to the stores
   shapesStore.subscribe((value) => {
     shapes = value;
@@ -128,6 +147,10 @@
     libraryOpen = value;
   });
 
+  recentlyImportedShapeIdStore.subscribe((value) => {
+    recentlyImportedShapeId = value;
+  });
+
   $: {
     if (ShapeSelectorDialog) {
       searchTerm = ShapeSelectorDialog.searchTerm;
@@ -135,6 +158,7 @@
       filteredShapes = ShapeSelectorDialog.filteredShapes;
       shapes = ShapeSelectorDialog.shapes;
       selectedItemId = ShapeSelectorDialog.selectedItemId;
+      recentlyImportedShapeId = ShapeSelectorDialog.recentlyImportedShapeId;
       dialogOpen = ShapeSelectorDialog.dialogOpen;
       importButtonSelected = ShapeSelectorDialog.importButtonSelected;
       libraryOpen = ShapeSelectorDialog.libraryOpen;
@@ -498,6 +522,12 @@
     color: #ffffff;
   }
 
+  .shape-selector-dialog .recently-imported {
+    background: #ececec;
+    border: 0.04375rem solid #cecece;
+    border-radius: 3px;
+  }
+
   .shape-selector-dialog .font-selected {
     color: white !important;
   }
@@ -592,7 +622,7 @@
 
 <div>
   {#if libraryOpen}
-    <LibraryDialog {closeLibrary} {addNewShape}/>
+    <LibraryDialog {closeLibrary} {addNewShape} />
   {/if}
   <div
     class="shape-selector-dialog"
@@ -669,7 +699,10 @@
                   />Import From...</button
                 >
                 {#if importButtonSelected}
-                  <div class="dropdown-content" transition:fade={{ duration: 500 }}>
+                  <div
+                    class="dropdown-content"
+                    transition:fade={{ duration: 500 }}
+                  >
                     <button
                       class="dropdown-button library-button"
                       on:click={ShapeSelectorDialog.openLibrary()}
@@ -704,12 +737,17 @@
           />
         </div>
         <div class="shape-selector-grid">
-          <div class="shape-selector-grid-inner">
+          <div class="shape-selector-grid-inner" bind:this={container}>
             {#each filteredShapes as shape (shape.id)}
               <button
-              transition:fade="{{ duration: 500 }}"
+                use:scrollContainerIntoView={shape.id ===
+                  recentlyImportedShapeId}
+                transition:fade={{ duration: 500 }}
                 class="shape-selector-item {shape.id === selectedItemId
                   ? 'selected'
+                  : ''}
+                  {shape.id === recentlyImportedShapeId
+                  ? 'recently-imported'
                   : ''}"
                 on:mouseenter={() => (shape.hover = true)}
                 on:mouseleave={() => (shape.hover = false)}

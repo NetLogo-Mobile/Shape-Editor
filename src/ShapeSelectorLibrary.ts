@@ -7,7 +7,7 @@ export class GalapagosShapeSelectorLibrary {
 
   // dialog open state
   dialogOpen: boolean;
-  
+
   // Array of all shapes to display
   shapes: Shape[] = [];
 
@@ -27,18 +27,53 @@ export class GalapagosShapeSelectorLibrary {
   config: GalapagosShapeSelectorLibraryConfig;
 
   constructor(
-    parent: HTMLElement, 
-    config: GalapagosShapeSelectorLibraryConfig
+    parent: HTMLElement,
+    config: GalapagosShapeSelectorLibraryConfig,
   ) {
     // Initialize all fields
     this.parent = parent;
     // shapes array is initialized with default shapes, should be imported from json in the future
     this.shapes = [
-      { id: 1, name: 'default', image: 'shapes/down-arrow.png', type: 'turtle', hover: false, deletable: false},
-      { id: 2, name: 'apple', image: 'shapes/down-arrow.png', type: 'turtle', hover: false, deletable: true },
-      { id: 3, name: 'banana', image: 'shapes/down-arrow.png', type: 'turtle', hover: false, deletable: true },
-      { id: 4, name: 'peach', image: 'shapes/down-arrow.png', type: 'turtle' , hover: false, deletable: true},
-      { id: 5, name: 'down-arrow', image: 'shapes/down-arrow.png', type: 'link' , hover: false, deletable: true},
+      {
+        id: 1,
+        name: 'default',
+        image: 'shapes/down-arrow.png',
+        type: 'turtle',
+        hover: false,
+        deletable: false,
+      },
+      {
+        id: 2,
+        name: 'apple',
+        image: 'shapes/down-arrow.png',
+        type: 'turtle',
+        hover: false,
+        deletable: true,
+      },
+      {
+        id: 3,
+        name: 'banana',
+        image: 'shapes/down-arrow.png',
+        type: 'turtle',
+        hover: false,
+        deletable: true,
+      },
+      {
+        id: 4,
+        name: 'peach',
+        image: 'shapes/down-arrow.png',
+        type: 'turtle',
+        hover: false,
+        deletable: true,
+      },
+      {
+        id: 5,
+        name: 'down-arrow',
+        image: 'shapes/down-arrow.png',
+        type: 'link',
+        hover: false,
+        deletable: true,
+      },
     ];
     this.searchTerm = '';
     this.filteredShapes = this.shapes;
@@ -47,7 +82,7 @@ export class GalapagosShapeSelectorLibrary {
     this.filterShapes(this.currentType);
     this.dialogOpen = true;
   }
-  
+
   // function to filter shapes when type filter changes
   filterShapes(type: string) {
     this.currentType = type;
@@ -82,6 +117,4 @@ export class GalapagosShapeSelectorLibrary {
     console.log(this.shapes.find((shape) => shape.id === this.selectedItemId));
     this.config.onUpdateSelectedItemId(this.selectedItemId);
   }
-
 }
-

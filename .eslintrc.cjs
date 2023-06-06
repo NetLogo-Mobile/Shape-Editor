@@ -1,13 +1,15 @@
 module.exports = {
+  parser: '@typescript-eslint/parser',
   extends: [
-    "eslint:recommended",
-    "plugin:prettier/recommended",
-    "plugin:css/recommended"
+    'eslint:recommended',
+    'plugin:@typescript-eslint/recommended',
+    'plugin:prettier/recommended',
+    'plugin:css/recommended'
   ],
-  plugins: ["svelte3", "css"],
+  plugins: ['@typescript-eslint', 'svelte3', 'css'],
   parserOptions: {
     ecmaVersion: 2020,
-    sourceType: "module",
+    sourceType: 'module',
   },
   env: {
     browser: true,
@@ -15,15 +17,21 @@ module.exports = {
   },
   overrides: [
     {
-      files: ["*.svelte"],
-      processor: "svelte3/svelte3",
+      files: ['*.svelte'],
+      processor: 'svelte3/svelte3',
+    },
+    {
+      files: ["*.ts"], // This can also be ["*.ts", "*.tsx"] if you're using tsx files
+      rules: {
+        '@typescript-eslint/explicit-function-return-type': 'off',
+      },
     },
   ],
   settings: {
-    "svelte3/ignore-styles": (attrs) => attrs.lang === "scss",
+    'svelte3/typescript': require('typescript'), // pass the TypeScript package to the Svelte plugin
+    'svelte3/ignore-styles': (attrs) => attrs.lang === 'scss',
   },
   rules: {
-    "css/no-duplicate-selectors": ["error", { "count": 1 }],
-    "no-trailing-spaces": "error",
-  }
+    'no-trailing-spaces': 'error',
+  },
 };

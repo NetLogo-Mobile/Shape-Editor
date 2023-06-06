@@ -2,7 +2,7 @@
   import { GalapagosShapeSelectorLibrary } from './ShapeSelectorLibrary.ts';
   import { onMount } from 'svelte';
   import { writable } from 'svelte/store';
-  import {fade} from 'svelte/transition';
+  import { fade } from 'svelte/transition';
 
   let dialog;
   let header;
@@ -12,6 +12,7 @@
   let filteredShapes = [];
   let shapes = [];
   let selectedItemId = null;
+
   export let closeLibrary;
   export let addNewShape;
 
@@ -301,10 +302,11 @@
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    margin: /*13.5 px/16 9px/16 13.5px/16 9px/16*/ 0.84375rem 0.5625rem 0.84375rem 0.5625rem;
+    margin: /*13.5 px/16 9px/16 13.5px/16 9px/16*/ 0.84375rem 0.5625rem
+      0.84375rem 0.5625rem;
   }
 
-  .shape-selector-library-dialog .import-cancel-buttons{
+  .shape-selector-library-dialog .import-cancel-buttons {
     display: flex;
     flex-direction: row;
   }
@@ -317,8 +319,8 @@
     box-sizing: border-box;
     width: 2.75rem; /* 44px/16 */
     height: 1.3125rem; /* 21px/16 */
-    background: #E5E5E5;
-    border: 0.7px solid #D9D9D9;
+    background: #e5e5e5;
+    border: 0.7px solid #d9d9d9;
     border-radius: 1px;
     font-family: 'Lato';
     font-style: normal;
@@ -327,15 +329,18 @@
     line-height: /* 11px/16 */ 0.6875rem;
     display: flex;
     align-items: center;
-    justify-content: center ;
+    justify-content: center;
     color: #000000;
     padding: 0;
     cursor: pointer;
   }
-
 </style>
 
-<div class="shape-selector-library-dialog" bind:this={dialog} transition:fade="{{ duration: 500 }}">
+<div
+  class="shape-selector-library-dialog"
+  bind:this={dialog}
+  transition:fade={{ duration: 500 }}
+>
   <div class="shape-selector-library">
     <div class="shape-selector-header" bind:this={header}>
       <h2>Library</h2>
@@ -390,23 +395,18 @@
     <div class="import-cancel-buttons-container">
       <div class="import-cancel-buttons">
         <button
-        class="import-button"
-        on:click={() => {
-          if (selectedItemId) {
-            addNewShape(shapes.find((shape) => shape.id === selectedItemId));
-            closeLibrary();
-          }
-        }}
-      >
-        Import
-      </button>
-      <button
-      class="cancel-button"
-      on:click={closeLibrary}
-    >
-      Cancel
-    </button>
+          class="import-button"
+          on:click={() => {
+            if (selectedItemId) {
+              addNewShape(shapes.find((shape) => shape.id === selectedItemId));
+              closeLibrary();
+            }
+          }}
+        >
+          Import
+        </button>
+        <button class="cancel-button" on:click={closeLibrary}> Cancel </button>
+      </div>
     </div>
   </div>
-</div>
 </div>
