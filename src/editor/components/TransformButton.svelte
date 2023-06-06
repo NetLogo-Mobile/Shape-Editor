@@ -11,7 +11,7 @@ is maintained after the transformation (top-left corner remains at top-left).
 @param transformation A transformation function from R2 to R2.
 -->
 <script lang="ts">
-  import type { R2, Shape } from "../utils/geometry";
+  import type { R2, Shape } from '../utils/geometry';
 
   /**
    * A transformation function from R2 to R2.
@@ -50,13 +50,9 @@ is maintained after the transformation (top-left corner remains at top-left).
   };
 </script>
 
-<button on:click={transformShapes}>
-  <slot />
-</button>
-
 <style lang="scss">
-  @import "../style/variables.scss";
-  @import "../style/button.scss";
+  @import '../style/variables.scss';
+  @import '../style/button.scss';
 
   button {
     border-left: $color2 1px solid;
@@ -66,3 +62,7 @@ is maintained after the transformation (top-left corner remains at top-left).
     }
   }
 </style>
+
+<button on:click={transformShapes}>
+  <slot />
+</button>

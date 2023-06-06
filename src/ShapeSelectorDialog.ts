@@ -215,7 +215,8 @@ export class GalapagosShapeSelectorDialog {
       this.config.onUpdateShapes(this.shapes);
       this.filterShapes(this.currentType);
       this.selectedItemId = shape.id;
-      this.config.onUpdateSelectedItemId(this.selectedItemId);
+      this.recentlyImportedShapeId = shape.id;
+      this.config.onUpdateRecentlyImportedShape(this.recentlyImportedShapeId);
       return;
     }
     // insert shape by alphabetical order after the defaults

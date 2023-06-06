@@ -1,3 +1,4 @@
 node_modules
 public
 rollup.config.js
+src/editor/utils

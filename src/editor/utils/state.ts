@@ -146,7 +146,11 @@ export namespace History {
    * @param redoStack The list of undone states.
    * @returns The updated undo stack, the updated redo stack, and the new current state.
    */
-  export function undo(undoStack: Shape[][], redoStack: Shape[][], shapes: Shape[]): [Shape[][], Shape[][], Shape[]] {
+  export function undo(
+    undoStack: Shape[][],
+    redoStack: Shape[][],
+    shapes: Shape[],
+  ): [Shape[][], Shape[][], Shape[]] {
     if (undoStack.length === 0) {
       return [undoStack, redoStack, shapes];
     }
@@ -161,7 +165,11 @@ export namespace History {
    * @param redoStack The list of undone states.
    * @returns The updated undo stack, the updated redo stack, and the new current state.
    */
-  export function redo(undoStack: Shape[][], redoStack: Shape[][], shapes: Shape[]): [Shape[][], Shape[][], Shape[]] {
+  export function redo(
+    undoStack: Shape[][],
+    redoStack: Shape[][],
+    shapes: Shape[],
+  ): [Shape[][], Shape[][], Shape[]] {
     if (redoStack.length === 0) {
       return [undoStack, redoStack, shapes];
     }

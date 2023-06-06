@@ -111,6 +111,7 @@
 
   // scroll into view function
   function scrollContainerIntoView(node, newlyAdded) {
+    console.log(recentlyImportedShapeId)
     if (newlyAdded) {
       let relativeTop = node.offsetTop - container.offsetTop;
       if (
@@ -742,7 +743,6 @@
               <button
                 use:scrollContainerIntoView={shape.id ===
                   recentlyImportedShapeId}
-                transition:fade={{ duration: 500 }}
                 class="shape-selector-item {shape.id === selectedItemId
                   ? 'selected'
                   : ''}

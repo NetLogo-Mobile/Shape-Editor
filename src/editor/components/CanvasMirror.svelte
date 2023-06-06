@@ -9,9 +9,9 @@ This component provides a mirror of the canvas.
 -->
 
 <script lang="ts">
-  import { Shape } from "../utils/geometry";
-  import { Tool } from "../utils/state";
-  import SvgShape from "./SVGShape.svelte";
+  import { Shape } from '../utils/geometry';
+  import { Tool } from '../utils/state';
+  import SvgShape from './SVGShape.svelte';
 
   /**
    * The array of shapes on the canvas.
@@ -23,21 +23,24 @@ This component provides a mirror of the canvas.
   export let rotate: number = 0;
 </script>
 
-<svg
-  class="canvas-mirror"
-  xmlns="http://www.w3.org/2000/svg"
-  viewBox="0 0 300 300"
->
-  {#each shapes as shape}
-    <SvgShape bind:shape transform="translate(150 150) rotate({rotate}) translate(-150 -150)" />
-  {/each}
-</svg>
-
 <style lang="scss">
-  @import "../style/variables.scss";
+  @import '../style/variables.scss';
 
   .canvas-mirror {
     background-color: $canvas-color;
     // border-radius: $corner-radius;
   }
 </style>
+
+<svg
+  class="canvas-mirror"
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 300 300"
+>
+  {#each shapes as shape}
+    <SvgShape
+      bind:shape
+      transform="translate(150 150) rotate({rotate}) translate(-150 -150)"
+    />
+  {/each}
+</svg>

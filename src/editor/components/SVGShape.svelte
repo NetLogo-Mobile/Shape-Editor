@@ -17,7 +17,7 @@ It also changes the cursor style based on the current selected tool and shape.
   /** The SVG element that represents the shape. */
   let svg: SVGElement;
   /** The transform to display the element with. */
-  export let transform: string = "";
+  export let transform: string = '';
 
   /** The current shape being drawn or manipulated. */
   export let currentShape: Shape | null = null;
