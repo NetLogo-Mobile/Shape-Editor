@@ -119,7 +119,11 @@ export class GalapagosShapeSelectorLibrary {
       this.selectedItemIds.push(id);
     }
 
-    console.log(this.selectedItemIds.map(id => this.shapes.find((shape) => shape.id === id)));
+    console.log(
+      this.selectedItemIds.map((id) =>
+        this.shapes.find((shape) => shape.id === id),
+      ),
+    );
     this.config.onUpdateSelectedItemIds([...this.selectedItemIds]);
   }
 }

@@ -202,44 +202,43 @@ export class GalapagosShapeSelectorDialog {
     }
   }
 
-// function to handle adding shapes
-addNewShapes(newShapes: Shape[]) {
-  // set recently imported to empty
-  this.recentlyImportedShapeIds = [];
-  this.config.onUpdateRecentlyImportedShapes(this.recentlyImportedShapeIds);
+  // function to handle adding shapes
+  addNewShapes(newShapes: Shape[]) {
+    // set recently imported to empty
+    this.recentlyImportedShapeIds = [];
+    this.config.onUpdateRecentlyImportedShapes(this.recentlyImportedShapeIds);
 
-  newShapes.forEach((shape) => {
-    // make the shape the next available id and set the type to the current type
-    shape.id = Math.max(...this.shapes.map((shape) => shape.id)) + 1;
-    shape.type = this.currentType;
-    shape.hover = false;
-    shape.deletable = true;
-    
-    if (shape.name === 'default') {
-      shape.deletable = false;
-    }
+    newShapes.forEach((shape) => {
+      // make the shape the next available id and set the type to the current type
+      shape.id = Math.max(...this.shapes.map((shape) => shape.id)) + 1;
+      shape.type = this.currentType;
+      shape.hover = false;
+      shape.deletable = true;
 
-    // add shape to the shapes array
-    this.shapes.push(shape);
+      if (shape.name === 'default') {
+        shape.deletable = false;
+      }
 
-    // add to recently imported
-    this.recentlyImportedShapeIds.push(shape.id);
-  });
+      // add shape to the shapes array
+      this.shapes.push(shape);
 
-  // sort shapes by alphabetical order keeping defaults at the start
-  this.shapes.sort((a, b) => {
-    if (a.name === 'default') return -1;
-    if (b.name === 'default') return 1;
-    return a.name.localeCompare(b.name);
-  });
+      // add to recently imported
+      this.recentlyImportedShapeIds.push(shape.id);
+    });
 
-  this.shapes = [...this.shapes];
-  this.config.onUpdateShapes(this.shapes);
-  this.filterShapes(this.currentType);
-  
-  this.config.onUpdateRecentlyImportedShapes(this.recentlyImportedShapeIds);
-}
+    // sort shapes by alphabetical order keeping defaults at the start
+    this.shapes.sort((a, b) => {
+      if (a.name === 'default') return -1;
+      if (b.name === 'default') return 1;
+      return a.name.localeCompare(b.name);
+    });
 
+    this.shapes = [...this.shapes];
+    this.config.onUpdateShapes(this.shapes);
+    this.filterShapes(this.currentType);
+
+    this.config.onUpdateRecentlyImportedShapes(this.recentlyImportedShapeIds);
+  }
 
   // function to handle delete button click
   deleteShape(id: number) {

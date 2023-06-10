@@ -380,7 +380,9 @@
                   />
                 </div>
                 <div
-                  class="shape-selector-item-name {selectedItemIds.includes(shape.id)
+                  class="shape-selector-item-name {selectedItemIds.includes(
+                    shape.id,
+                  )
                     ? 'font-selected'
                     : ''}"
                 >
@@ -398,7 +400,9 @@
           class="import-button"
           on:click={() => {
             if (selectedItemIds.length > 0) {
-              addNewShapes(shapes.filter((shape) => selectedItemIds.includes(shape.id)));
+              addNewShapes(
+                shapes.filter((shape) => selectedItemIds.includes(shape.id)),
+              );
               closeLibrary();
             }
           }}
