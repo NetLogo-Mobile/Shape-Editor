@@ -12,5 +12,5 @@ export interface GalapagosShapeSelectorDialogConfig {
   // Callback function to update the main app state whether the library has been opened
   onUpdateLibraryOpen: (newState: boolean) => void;
   // Callback function to update the recently imported shape
-  onUpdateRecentlyImportedShape: (newState: any) => void;
+  onUpdateRecentlyImportedShapes: (recentlyImportedShapeIds: any[]) => void;
 }

@@ -16,18 +16,18 @@
   let filteredShapes = [];
   let shapes = [];
   let selectedItemId = null;
-  let recentlyImportedShapeId = null;
+  let recentlyImportedShapeIds = [];
   let dialogOpen = true;
   let importButtonSelected = false;
   let libraryOpen = false;
   let closeLibrary;
-  let addNewShape;
+  let addNewShapes;
 
   // Create writable stores for shapes, filteredShapes, and selectedItemId
   const shapesStore = writable([]);
   const filteredShapesStore = writable([]);
   const selectedItemIdStore = writable(null);
-  const recentlyImportedShapeIdStore = writable(null);
+  const recentlyImportedShapeIdsStore = writable([]);
   const dialogOpenStore = writable(true);
   const importButtonSelectedStore = writable(false);
   const libraryOpenStore = writable(false);
@@ -54,8 +54,8 @@
       onUpdateLibraryOpen: (newLibraryOpen) => {
         libraryOpenStore.set(newLibraryOpen);
       },
-      onUpdateRecentlyImportedShape: (newRecentlyImportedShapeId) => {
-        recentlyImportedShapeIdStore.set(newRecentlyImportedShapeId);
+      onUpdateRecentlyImportedShapes: (newRecentlyImportedShapeIds) => {
+        recentlyImportedShapeIdsStore.set(newRecentlyImportedShapeIds);
       },
     };
 
@@ -72,8 +72,8 @@
       ShapeSelectorDialog.closeLibrary();
     };
 
-    addNewShape = (shape) => {
-      ShapeSelectorDialog.addNewShape(shape);
+    addNewShapes = (shapes) => {
+      ShapeSelectorDialog.addNewShapes(shapes);
     };
 
     header.addEventListener(
@@ -111,7 +111,6 @@
 
   // scroll into view function
   function scrollContainerIntoView(node, newlyAdded) {
-    console.log(recentlyImportedShapeId)
     if (newlyAdded) {
       let relativeTop = node.offsetTop - container.offsetTop;
       if (
@@ -148,8 +147,8 @@
     libraryOpen = value;
   });
 
-  recentlyImportedShapeIdStore.subscribe((value) => {
-    recentlyImportedShapeId = value;
+  recentlyImportedShapeIdsStore.subscribe((value) => {
+    recentlyImportedShapeIds = value;
   });
 
   $: {
@@ -159,7 +158,7 @@
       filteredShapes = ShapeSelectorDialog.filteredShapes;
       shapes = ShapeSelectorDialog.shapes;
       selectedItemId = ShapeSelectorDialog.selectedItemId;
-      recentlyImportedShapeId = ShapeSelectorDialog.recentlyImportedShapeId;
+      recentlyImportedShapeIds = ShapeSelectorDialog.recentlyImportedShapeIds;
       dialogOpen = ShapeSelectorDialog.dialogOpen;
       importButtonSelected = ShapeSelectorDialog.importButtonSelected;
       libraryOpen = ShapeSelectorDialog.libraryOpen;
@@ -623,7 +622,7 @@
 
 <div>
   {#if libraryOpen}
-    <LibraryDialog {closeLibrary} {addNewShape} />
+    <LibraryDialog {closeLibrary} {addNewShapes} />
   {/if}
   <div
     class="shape-selector-dialog"
@@ -741,12 +740,13 @@
           <div class="shape-selector-grid-inner" bind:this={container}>
             {#each filteredShapes as shape (shape.id)}
               <button
-                use:scrollContainerIntoView={shape.id ===
-                  recentlyImportedShapeId}
+                use:scrollContainerIntoView={recentlyImportedShapeIds.includes(
+                  shape.id,
+                )}
                 class="shape-selector-item {shape.id === selectedItemId
                   ? 'selected'
                   : ''}
-                  {shape.id === recentlyImportedShapeId
+                  {recentlyImportedShapeIds.includes(shape.id)
                   ? 'recently-imported'
                   : ''}"
                 on:mouseenter={() => (shape.hover = true)}

@@ -20,8 +20,8 @@ export class GalapagosShapeSelectorLibrary {
   // The current type filter applied to the shape list
   currentType: string;
 
-  // The ID of the currently selected shape
-  selectedItemId: number | null = null;
+  // The IDs of the currently selected shapes
+  selectedItemIds: number[] = [];
 
   // Config object containing callback functions to update the main app state
   config: GalapagosShapeSelectorLibraryConfig;
@@ -107,14 +107,19 @@ export class GalapagosShapeSelectorLibrary {
   }
 
   // function to handle shape selection
-  setSelectedItemId(id: number | null) {
-    if (this.selectedItemId === id) {
-      this.selectedItemId = null;
+  setSelectedItemId(id: number) {
+    // find the index of the id in the array
+    const index = this.selectedItemIds.indexOf(id);
+
+    // if id is in the array, remove it
+    if (index > -1) {
+      this.selectedItemIds.splice(index, 1);
     } else {
-      this.selectedItemId = id;
+      // if id is not in the array, add it
+      this.selectedItemIds.push(id);
     }
-    // console log this information in selected shape
-    console.log(this.shapes.find((shape) => shape.id === this.selectedItemId));
-    this.config.onUpdateSelectedItemId(this.selectedItemId);
+
+    console.log(this.selectedItemIds.map(id => this.shapes.find((shape) => shape.id === id)));
+    this.config.onUpdateSelectedItemIds([...this.selectedItemIds]);
   }
 }

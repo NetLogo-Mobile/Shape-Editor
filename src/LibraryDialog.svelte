@@ -11,15 +11,15 @@
   let currentType;
   let filteredShapes = [];
   let shapes = [];
-  let selectedItemId = null;
+  let selectedItemIds = [];
 
   export let closeLibrary;
-  export let addNewShape;
+  export let addNewShapes;
 
-  // Create writable stores for shapes, filteredShapes, and selectedItemId
+  // Create writable stores for shapes, filteredShapes, and selectedItemIds
   const shapesStore = writable([]);
   const filteredShapesStore = writable([]);
-  const selectedItemIdStore = writable(null);
+  const selectedItemIdsStore = writable([]);
   const importButtonSelectedStore = writable(false);
 
   // Initialize ShapeSelectorLibrary and set up update functions when the component is mounted
@@ -32,8 +32,8 @@
       onUpdateFilteredShapes: (newFilteredShapes) => {
         filteredShapesStore.set(newFilteredShapes);
       },
-      onUpdateSelectedItemId: (newSelectedItemId) => {
-        selectedItemIdStore.set(newSelectedItemId);
+      onUpdateSelectedItemIds: (newSelectedItemIds) => {
+        selectedItemIdsStore.set(newSelectedItemIds);
       },
       onUpdateImportButtonSelected: (newImportButtonSelected) => {
         importButtonSelectedStore.set(newImportButtonSelected);
@@ -91,8 +91,8 @@
     filteredShapes = value;
   });
 
-  selectedItemIdStore.subscribe((value) => {
-    selectedItemId = value;
+  selectedItemIdsStore.subscribe((value) => {
+    selectedItemIds = value;
   });
 
   $: {
@@ -101,7 +101,7 @@
       currentType = ShapeSelectorLibrary.currentType;
       filteredShapes = ShapeSelectorLibrary.filteredShapes;
       shapes = ShapeSelectorLibrary.shapes;
-      selectedItemId = ShapeSelectorLibrary.selectedItemId;
+      selectedItemIds = ShapeSelectorLibrary.selectedItemIds;
     }
   }
 </script>
@@ -362,7 +362,7 @@
         <div class="shape-selector-grid-inner">
           {#each filteredShapes as shape (shape.id)}
             <button
-              class="shape-selector-item {shape.id === selectedItemId
+              class="shape-selector-item {selectedItemIds.includes(shape.id)
                 ? 'selected'
                 : ''}"
               on:mouseenter={() => (shape.hover = true)}
@@ -380,7 +380,7 @@
                   />
                 </div>
                 <div
-                  class="shape-selector-item-name {shape.id === selectedItemId
+                  class="shape-selector-item-name {selectedItemIds.includes(shape.id)
                     ? 'font-selected'
                     : ''}"
                 >
@@ -397,8 +397,8 @@
         <button
           class="import-button"
           on:click={() => {
-            if (selectedItemId) {
-              addNewShape(shapes.find((shape) => shape.id === selectedItemId));
+            if (selectedItemIds.length > 0) {
+              addNewShapes(shapes.filter((shape) => selectedItemIds.includes(shape.id)));
               closeLibrary();
             }
           }}

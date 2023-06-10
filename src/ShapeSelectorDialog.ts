@@ -23,8 +23,8 @@ export class GalapagosShapeSelectorDialog {
   // The ID of the currently selected shape
   selectedItemId: number | null = null;
 
-  // the ID of the recently imported shape
-  recentlyImportedShapeId: number | null = null;
+  // The IDs of the recently imported shapes
+  recentlyImportedShapeIds: number[] = [];
 
   // Config object containing callback functions to update the main app state
   config: GalapagosShapeSelectorDialogConfig;
@@ -199,49 +199,44 @@ export class GalapagosShapeSelectorDialog {
     }
   }
 
-  // function to handle adding a shape
-  addNewShape(shape: Shape) {
+// function to handle adding shapes
+addNewShapes(newShapes: Shape[]) {
+  // set recently imported to empty
+  this.recentlyImportedShapeIds = [];
+  this.config.onUpdateRecentlyImportedShapes(this.recentlyImportedShapeIds);
+
+  newShapes.forEach((shape) => {
     // make the shape the next available id and set the type to the current type
     shape.id = Math.max(...this.shapes.map((shape) => shape.id)) + 1;
     shape.type = this.currentType;
     shape.hover = false;
     shape.deletable = true;
-
-    // if the name is default, insert at the beginning
+    
     if (shape.name === 'default') {
       shape.deletable = false;
-      this.shapes.unshift(shape);
-      this.shapes = [...this.shapes];
-      this.config.onUpdateShapes(this.shapes);
-      this.filterShapes(this.currentType);
-      this.selectedItemId = shape.id;
-      this.recentlyImportedShapeId = shape.id;
-      this.config.onUpdateRecentlyImportedShape(this.recentlyImportedShapeId);
-      return;
-    }
-    // insert shape by alphabetical order after the defaults
-    let insertIndex = -1;
-    for (let i = 0; i < this.shapes.length; i++) {
-      if (
-        this.shapes[i].name != 'default' &&
-        this.shapes[i].name > shape.name
-      ) {
-        insertIndex = i;
-        break;
-      }
     }
 
-    if (insertIndex === -1) {
-      insertIndex = this.shapes.length;
-    }
-    this.shapes.splice(insertIndex, 0, shape);
-    this.shapes = [...this.shapes];
-    this.config.onUpdateShapes(this.shapes);
-    this.selectedItemId = shape.id;
-    this.recentlyImportedShapeId = shape.id;
-    this.config.onUpdateRecentlyImportedShape(this.recentlyImportedShapeId);
-    this.filterShapes(this.currentType);
-  }
+    // add shape to the shapes array
+    this.shapes.push(shape);
+
+    // add to recently imported
+    this.recentlyImportedShapeIds.push(shape.id);
+  });
+
+  // sort shapes by alphabetical order keeping defaults at the start
+  this.shapes.sort((a, b) => {
+    if (a.name === 'default') return -1;
+    if (b.name === 'default') return 1;
+    return a.name.localeCompare(b.name);
+  });
+
+  this.shapes = [...this.shapes];
+  this.config.onUpdateShapes(this.shapes);
+  this.filterShapes(this.currentType);
+  
+  this.config.onUpdateRecentlyImportedShapes(this.recentlyImportedShapeIds);
+}
+
 
   // function to handle delete button click
   deleteShape(id: number) {
@@ -294,8 +289,8 @@ export class GalapagosShapeSelectorDialog {
     }
     // console log this information in selected shape
     console.log(this.shapes.find((shape) => shape.id === this.selectedItemId));
-    this.recentlyImportedShapeId = null;
-    this.config.onUpdateRecentlyImportedShape(this.recentlyImportedShapeId);
+    this.recentlyImportedShapeIds = [];
+    this.config.onUpdateRecentlyImportedShapes(this.recentlyImportedShapeIds);
     this.config.onUpdateSelectedItemId(this.selectedItemId);
   }
 }
