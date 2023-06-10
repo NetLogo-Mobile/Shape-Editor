@@ -5,4 +5,5 @@ export interface Shape {
   type: string;
   hover: boolean;
   deletable: boolean;
+  isDeleting: boolean;
 }

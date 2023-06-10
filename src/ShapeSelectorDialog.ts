@@ -35,6 +35,7 @@ export class GalapagosShapeSelectorDialog {
   // Boolean to track if the library has been opened
   libraryOpen: boolean;
 
+  // Constructor function
   constructor(parent: HTMLElement, config: GalapagosShapeSelectorDialogConfig) {
     // Initialize all fields
     this.parent = parent;
@@ -47,46 +48,16 @@ export class GalapagosShapeSelectorDialog {
         type: 'turtle',
         hover: false,
         deletable: false,
+        isDeleting: false,
       },
       {
         id: 2,
-        name: 'apple',
-        image: 'shapes/down-arrow.png',
-        type: 'turtle',
-        hover: false,
-        deletable: true,
-      },
-      {
-        id: 3,
-        name: 'banana',
-        image: 'shapes/down-arrow.png',
-        type: 'turtle',
-        hover: false,
-        deletable: true,
-      },
-      {
-        id: 4,
-        name: 'peach',
-        image: 'shapes/down-arrow.png',
-        type: 'turtle',
-        hover: false,
-        deletable: true,
-      },
-      {
-        id: 5,
-        name: 'down-arrow',
+        name: 'default',
         image: 'shapes/down-arrow.png',
         type: 'link',
         hover: false,
-        deletable: true,
-      },
-      {
-        id: 6,
-        name: 'down-arrow',
-        image: 'shapes/down-arrow.png',
-        type: 'link',
-        hover: false,
-        deletable: true,
+        deletable: false,
+        isDeleting: false,
       },
     ];
     this.searchTerm = '';
@@ -113,7 +84,7 @@ export class GalapagosShapeSelectorDialog {
     this.config.onUpdateImportButtonSelected(this.importButtonSelected);
   }
 
-  //
+  // function to close the library
   closeLibrary() {
     console.log('close library');
     this.libraryOpen = false;
@@ -132,6 +103,7 @@ export class GalapagosShapeSelectorDialog {
       type: this.currentType,
       hover: false,
       deletable: true,
+      isDeleting: false,
     };
     // Add the new shape to the beginning of the shape array and update the filtered shape list
     this.shapes.unshift(newShape);
@@ -241,23 +213,40 @@ export class GalapagosShapeSelectorDialog {
   }
 
   // function to handle delete button click
-  deleteShape(id: number) {
-    let shapeIndexToDelete = -1;
-    for (let i = 0; i < this.shapes.length; i++) {
-      if (this.shapes[i].id === id) {
-        shapeIndexToDelete = i;
-        break;
-      }
+deleteShape(id: number) {
+  console.log('delete shape');
+  let shapeIndexToDelete = -1;
+  let filteredShapeIndexToDelete = -1;
+  for (let i = 0; i < this.shapes.length; i++) {
+    if (this.shapes[i].id === id) {
+      shapeIndexToDelete = i;
     }
+  }
 
-    if (shapeIndexToDelete !== -1) {
+  for (let i = 0; i < this.filteredShapes.length; i++) {
+    if (this.filteredShapes[i].id === id) {
+      filteredShapeIndexToDelete = i;
+    }
+  }
+
+  if (shapeIndexToDelete !== -1 && filteredShapeIndexToDelete !== -1) {
+    this.shapes[shapeIndexToDelete].isDeleting = true;
+    this.filteredShapes[filteredShapeIndexToDelete].isDeleting = true;
+    this.shapes = [...this.shapes];
+    this.filteredShapes = [...this.filteredShapes];
+    this.config.onUpdateShapes(this.shapes);
+    this.config.onUpdateFilteredShapes(this.filteredShapes);
+
+    setTimeout(() => {
       this.shapes.splice(shapeIndexToDelete, 1);
       this.shapes = [...this.shapes];
       this.handleSearch(this.searchTerm);
       this.config.onUpdateShapes(this.shapes);
       this.config.onUpdateFilteredShapes(this.filteredShapes);
-    }
+    }, 500);
   }
+}
+
 
   // function to filter shapes when type filter changes
   filterShapes(type: string) {
