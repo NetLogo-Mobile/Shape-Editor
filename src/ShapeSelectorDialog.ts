@@ -122,6 +122,9 @@ export class GalapagosShapeSelectorDialog {
 
   // Create a new default shape object
   createShape() {
+    // set imported shapes to empty
+    this.recentlyImportedShapeIds = [];
+    this.config.onUpdateRecentlyImportedShapes(this.recentlyImportedShapeIds);
     const newShape: Shape = {
       id: Math.max(...this.shapes.map((shape) => shape.id)) + 1,
       name: 'new default',
