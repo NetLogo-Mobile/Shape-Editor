@@ -1,4 +1,4 @@
-import {Shape} from './ShapeSelectorShape';
+import { Shape } from './ShapeSelectorShape';
 
 export interface GalapagosShapeSelectorDialogConfig {
   // Callback function to update the main app state with the full shape list

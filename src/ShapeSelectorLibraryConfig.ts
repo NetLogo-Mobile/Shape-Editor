@@ -1,8 +1,8 @@
-import {Shape} from './ShapeSelectorShape';
+import { Shape } from './ShapeSelectorShape';
 
 export interface GalapagosShapeSelectorLibraryConfig {
   // Callback function to update the main app state with the full shape list
-  onUpdateShapes: (shapes: any[]) => void;
+  onUpdateShapes: (shapes: Shape[]) => void;
   // Callback function to update the main app state with the filtered shape list
   onUpdateFilteredShapes: (filteredShapes: Shape[]) => void;
   // Callback function to update the main app state with the selected shape IDs
