@@ -213,40 +213,39 @@ export class GalapagosShapeSelectorDialog {
   }
 
   // function to handle delete button click
-deleteShape(id: number) {
-  console.log('delete shape');
-  let shapeIndexToDelete = -1;
-  let filteredShapeIndexToDelete = -1;
-  for (let i = 0; i < this.shapes.length; i++) {
-    if (this.shapes[i].id === id) {
-      shapeIndexToDelete = i;
+  deleteShape(id: number) {
+    console.log('delete shape');
+    let shapeIndexToDelete = -1;
+    let filteredShapeIndexToDelete = -1;
+    for (let i = 0; i < this.shapes.length; i++) {
+      if (this.shapes[i].id === id) {
+        shapeIndexToDelete = i;
+      }
     }
-  }
 
-  for (let i = 0; i < this.filteredShapes.length; i++) {
-    if (this.filteredShapes[i].id === id) {
-      filteredShapeIndexToDelete = i;
+    for (let i = 0; i < this.filteredShapes.length; i++) {
+      if (this.filteredShapes[i].id === id) {
+        filteredShapeIndexToDelete = i;
+      }
     }
-  }
 
-  if (shapeIndexToDelete !== -1 && filteredShapeIndexToDelete !== -1) {
-    this.shapes[shapeIndexToDelete].isDeleting = true;
-    this.filteredShapes[filteredShapeIndexToDelete].isDeleting = true;
-    this.shapes = [...this.shapes];
-    this.filteredShapes = [...this.filteredShapes];
-    this.config.onUpdateShapes(this.shapes);
-    this.config.onUpdateFilteredShapes(this.filteredShapes);
-
-    setTimeout(() => {
-      this.shapes.splice(shapeIndexToDelete, 1);
+    if (shapeIndexToDelete !== -1 && filteredShapeIndexToDelete !== -1) {
+      this.shapes[shapeIndexToDelete].isDeleting = true;
+      this.filteredShapes[filteredShapeIndexToDelete].isDeleting = true;
       this.shapes = [...this.shapes];
-      this.handleSearch(this.searchTerm);
+      this.filteredShapes = [...this.filteredShapes];
       this.config.onUpdateShapes(this.shapes);
       this.config.onUpdateFilteredShapes(this.filteredShapes);
-    }, 500);
-  }
-}
 
+      setTimeout(() => {
+        this.shapes.splice(shapeIndexToDelete, 1);
+        this.shapes = [...this.shapes];
+        this.handleSearch(this.searchTerm);
+        this.config.onUpdateShapes(this.shapes);
+        this.config.onUpdateFilteredShapes(this.filteredShapes);
+      }, 500);
+    }
+  }
 
   // function to filter shapes when type filter changes
   filterShapes(type: string) {

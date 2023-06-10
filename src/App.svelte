@@ -4,7 +4,6 @@
   import { onMount } from 'svelte';
   import { writable } from 'svelte/store';
   import { fade } from 'svelte/transition';
-  
 
   // dom elements
   let dialog;
@@ -57,7 +56,7 @@
       },
       onUpdateRecentlyImportedShapes: (newRecentlyImportedShapeIds) => {
         recentlyImportedShapeIdsStore.set(newRecentlyImportedShapeIds);
-      }
+      },
     };
 
     // Initialize ShapeSelectorDialog
@@ -581,15 +580,19 @@
     margin-bottom: 0;
   }
 
-.shape-selector-dialog .is-deleting {
-  color: red;
-  animation: fadeout 0.5s forwards;
-}
+  .shape-selector-dialog .is-deleting {
+    color: red;
+    animation: fadeout 0.5s forwards;
+  }
 
-@keyframes fadeout {
-  from { opacity: 1; }
-  to   { opacity: 0; }
-}
+  @keyframes fadeout {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
 
   .shape-selector-dialog .shape-selector-details {
     width: 100%;
@@ -762,7 +765,6 @@
                   ? 'recently-imported'
                   : ''}
                    {shape.isDeleting ? 'is-deleting' : ''}"
-                 
                 on:mouseenter={() => (shape.hover = true)}
                 on:mouseleave={() => (shape.hover = false)}
                 on:focus={() => (shape.hover = true)}

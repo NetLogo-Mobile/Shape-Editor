@@ -40,7 +40,7 @@ export class GalapagosShapeSelectorLibrary {
         image: 'shapes/down-arrow.png',
         type: 'turtle',
         hover: false,
-        deletable: false,
+        deletable: true,
         isDeleting: false,
       },
     ];
