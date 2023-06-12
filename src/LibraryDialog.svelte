@@ -209,6 +209,14 @@
     padding-left: 1.25rem; /* 20px/16 */
   }
 
+  .shape-selector-library-dialog .scrollbar-wrapper {
+    width: 100%;
+    height: 11.25rem; /* 180px/16 */
+    overflow-x: hidden; /* Hide horizontal scroll */
+    overflow-y: scroll;
+    padding-right: 0.875rem;
+  }
+
   .shape-selector-library-dialog .shape-selector-grid {
     flex: 1;
     overflow: hidden;
@@ -220,7 +228,6 @@
   }
 
   .shape-selector-library-dialog .shape-selector-grid-inner {
-    overflow-y: auto;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-gap: 0.3125rem; /* 5px/16 */
@@ -359,6 +366,9 @@
         />
       </div>
       <div class="shape-selector-grid">
+        <div class="scrollbar-wrapper">
+
+          
         <div class="shape-selector-grid-inner">
           {#each filteredShapes as shape (shape.id)}
             <button
@@ -392,6 +402,7 @@
             </button>
           {/each}
         </div>
+      </div>
       </div>
     </div>
     <div class="import-cancel-buttons-container">

@@ -481,6 +481,15 @@
     padding-left: 1.25rem; /* 20px/16 */
   }
 
+  .shape-selector-dialog .scrollbar-wrapper {
+    width: 100%;
+    height: 11.25rem; /* 180px/16 */
+    overflow-x: hidden; /* Hide horizontal scroll */
+    overflow-y: scroll;
+    padding-right: 0.875rem;
+  }
+
+
   .shape-selector-dialog .shape-selector-grid {
     flex: 1;
     overflow: hidden;
@@ -492,31 +501,29 @@
   }
 
   .shape-selector-dialog .shape-selector-grid-inner {
-  overflow-x: hidden;  /* Hide horizontal scroll */
-  overflow-y: auto;
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  grid-gap: 0.3125rem; /* 5px/16 */
-  width: 100%;
-  height: 11.25rem; /* 180px/16 */
-  box-sizing: border-box;
-  align-content: start;
-}
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-gap: 0.3125rem; /* 5px/16 */
+    width: 100%;
+    height: 11.25rem; /* 180px/16 */
+    box-sizing: border-box;
+    align-content: start;
+  }
 
-.shape-selector-dialog .shape-selector-item {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #f2f2f2;
-  width: 4.9375rem; /* 79px/16 */
-  height: 4.4375rem; /* 71px/16 */
-  margin: 0;
-  background: #ffffff;
-  border: 0.04375rem solid #cecece; /* 0.7px/16 */
-  border-radius: 3px;
-  box-sizing: border-box;
-}
+  .shape-selector-dialog .shape-selector-item {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f2f2f2;
+    width: 4.9375rem; /* 79px/16 */
+    height: 4.4375rem; /* 71px/16 */
+    margin: 0;
+    background: #ffffff;
+    border: 0.04375rem solid #cecece; /* 0.7px/16 */
+    border-radius: 3px;
+    box-sizing: border-box;
+  }
 
   .shape-selector-dialog .selected {
     background: #7d7d7d;
@@ -753,7 +760,9 @@
             style="background-image: url('icons/search-icon.png');"
           />
         </div>
+
         <div class="shape-selector-grid">
+          <div class="scrollbar-wrapper">
           <div class="shape-selector-grid-inner" bind:this={container}>
             {#each filteredShapes as shape (shape.id)}
               <button
@@ -833,6 +842,7 @@
               </button>
             {/each}
           </div>
+        </div>
         </div>
       </div>
     </div>
