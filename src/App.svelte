@@ -487,6 +487,7 @@
     overflow-x: hidden; /* Hide horizontal scroll */
     overflow-y: auto;
     padding-right: 0.875rem;
+    padding-top: 0.875rem;
   }
 
   .shape-selector-dialog .shape-selector-grid {
@@ -496,7 +497,7 @@
     box-shadow: inset 0.125rem 0.1875rem 0.25rem rgba(0, 0, 0, 0.25); /* 2px/16, 3px/16, 4px/16 */
     border-radius: 5px 2px 2px 5px;
     margin-top: 0.875rem; /* 14px/16 */
-    padding: 0.875rem 0.875rem 0 0.875rem; /* 14px/16, 14px/16, 0, 14px/16 */
+    padding: 0 0.875rem 0 0.875rem; /* 14px/16 */
   }
 
   .shape-selector-dialog .shape-selector-grid-inner {
