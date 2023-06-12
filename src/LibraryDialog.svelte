@@ -213,7 +213,7 @@
     width: 100%;
     height: 100%; /* 180px/16 */
     overflow-x: hidden; /* Hide horizontal scroll */
-    overflow-y: auto;
+    overflow-y: scroll;
     padding-right: 0.875rem;
     padding-top: 0.875rem;
   }
