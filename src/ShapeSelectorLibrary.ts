@@ -51,16 +51,16 @@ export class GalapagosShapeSelectorLibrary {
         hover: false,
         deletable: true,
         isDeleting: false,
-        },
-        {
-          id: 3,
-          name: 'turtle',
-          image: 'shapes/cute-turtle.png',
-          type: 'turtle',
-          hover: false,
-          deletable: true,
-          isDeleting: false,
-        },
+      },
+      {
+        id: 3,
+        name: 'turtle',
+        image: 'shapes/cute-turtle.png',
+        type: 'turtle',
+        hover: false,
+        deletable: true,
+        isDeleting: false,
+      },
     ];
     this.searchTerm = '';
     this.filteredShapes = this.shapes;
