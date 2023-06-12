@@ -485,10 +485,9 @@
     width: 100%;
     height: 11.25rem; /* 180px/16 */
     overflow-x: hidden; /* Hide horizontal scroll */
-    overflow-y: scroll;
+    overflow-y: auto;
     padding-right: 0.875rem;
   }
-
 
   .shape-selector-dialog .shape-selector-grid {
     flex: 1;
@@ -763,86 +762,88 @@
 
         <div class="shape-selector-grid">
           <div class="scrollbar-wrapper">
-          <div class="shape-selector-grid-inner" bind:this={container}>
-            {#each filteredShapes as shape (shape.id)}
-              <button
-                in:fade
-                use:scrollContainerIntoView={recentlyImportedShapeIds.includes(
-                  shape.id,
-                )}
-                class="shape-selector-item {shape.id === selectedItemId
-                  ? 'selected'
-                  : ''}
+            <div class="shape-selector-grid-inner" bind:this={container}>
+              {#each filteredShapes as shape (shape.id)}
+                <button
+                  in:fade
+                  use:scrollContainerIntoView={recentlyImportedShapeIds.includes(
+                    shape.id,
+                  )}
+                  class="shape-selector-item {shape.id === selectedItemId
+                    ? 'selected'
+                    : ''}
                   {recentlyImportedShapeIds.includes(shape.id)
-                  ? 'recently-imported'
-                  : ''}
+                    ? 'recently-imported'
+                    : ''}
                    {shape.isDeleting ? 'is-deleting' : ''}"
-                on:mouseenter={() => (shape.hover = true)}
-                on:mouseleave={() => (shape.hover = false)}
-                on:focus={() => (shape.hover = true)}
-                on:blur={() => (shape.hover = false)}
-                on:click={() => ShapeSelectorDialog.setSelectedItemId(shape.id)}
-              >
-                <div class="shape-selector-item-buttons">
-                  <button
-                    on:click={(event) => {
-                      event.stopPropagation();
-                      ShapeSelectorDialog.duplicateShape(shape.id);
-                    }}
-                    on:keydown={(event) => {
-                      if (event.key === 'Enter') {
+                  on:mouseenter={() => (shape.hover = true)}
+                  on:mouseleave={() => (shape.hover = false)}
+                  on:focus={() => (shape.hover = true)}
+                  on:blur={() => (shape.hover = false)}
+                  on:click={() =>
+                    ShapeSelectorDialog.setSelectedItemId(shape.id)}
+                >
+                  <div class="shape-selector-item-buttons">
+                    <button
+                      on:click={(event) => {
                         event.stopPropagation();
                         ShapeSelectorDialog.duplicateShape(shape.id);
-                      }
-                    }}
-                    aria-label="Duplicate shape"
-                    class="duplicate-icon"
-                    style="display: {shape.hover
-                      ? 'block'
-                      : 'none'}; background-image: url('icons/duplicate-icon.png');"
-                  />
+                      }}
+                      on:keydown={(event) => {
+                        if (event.key === 'Enter') {
+                          event.stopPropagation();
+                          ShapeSelectorDialog.duplicateShape(shape.id);
+                        }
+                      }}
+                      aria-label="Duplicate shape"
+                      class="duplicate-icon"
+                      style="display: {shape.hover
+                        ? 'block'
+                        : 'none'}; background-image: url('icons/duplicate-icon.png');"
+                    />
 
-                  <button
-                    on:click={(event) => {
-                      event.stopPropagation();
-                      ShapeSelectorDialog.deleteShape(shape.id);
-                    }}
-                    on:keydown={(event) => {
-                      if (event.key === 'Enter') {
+                    <button
+                      on:click={(event) => {
                         event.stopPropagation();
                         ShapeSelectorDialog.deleteShape(shape.id);
-                      }
-                    }}
-                    aria-label="Delete shape"
-                    class="delete-icon {shape.deletable
-                      ? ''
-                      : 'button-disabled'}"
-                    style="display: {shape.hover
-                      ? 'block'
-                      : 'none'}; background-image: url('icons/delete-icon.png');"
-                    disabled={!shape.deletable}
-                  />
-                </div>
-                <div class="shape-selector-details">
-                  <div class="shape-selector-item-image-div">
-                    <img
-                      class="shape-selector-item-image"
-                      src={shape.image}
-                      alt=""
+                      }}
+                      on:keydown={(event) => {
+                        if (event.key === 'Enter') {
+                          event.stopPropagation();
+                          ShapeSelectorDialog.deleteShape(shape.id);
+                        }
+                      }}
+                      aria-label="Delete shape"
+                      class="delete-icon {shape.deletable
+                        ? ''
+                        : 'button-disabled'}"
+                      style="display: {shape.hover
+                        ? 'block'
+                        : 'none'}; background-image: url('icons/delete-icon.png');"
+                      disabled={!shape.deletable}
                     />
                   </div>
-                  <div
-                    class="shape-selector-item-name {shape.id === selectedItemId
-                      ? 'font-selected'
-                      : ''}"
-                  >
-                    {shape.name}
+                  <div class="shape-selector-details">
+                    <div class="shape-selector-item-image-div">
+                      <img
+                        class="shape-selector-item-image"
+                        src={shape.image}
+                        alt=""
+                      />
+                    </div>
+                    <div
+                      class="shape-selector-item-name {shape.id ===
+                      selectedItemId
+                        ? 'font-selected'
+                        : ''}"
+                    >
+                      {shape.name}
+                    </div>
                   </div>
-                </div>
-              </button>
-            {/each}
+                </button>
+              {/each}
+            </div>
           </div>
-        </div>
         </div>
       </div>
     </div>

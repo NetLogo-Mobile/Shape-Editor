@@ -213,7 +213,7 @@
     width: 100%;
     height: 11.25rem; /* 180px/16 */
     overflow-x: hidden; /* Hide horizontal scroll */
-    overflow-y: scroll;
+    overflow-y: auto;
     padding-right: 0.875rem;
   }
 
@@ -367,42 +367,41 @@
       </div>
       <div class="shape-selector-grid">
         <div class="scrollbar-wrapper">
-
-          
-        <div class="shape-selector-grid-inner">
-          {#each filteredShapes as shape (shape.id)}
-            <button
-              class="shape-selector-item {selectedItemIds.includes(shape.id)
-                ? 'selected'
-                : ''}"
-              on:mouseenter={() => (shape.hover = true)}
-              on:mouseleave={() => (shape.hover = false)}
-              on:focus={() => (shape.hover = true)}
-              on:blur={() => (shape.hover = false)}
-              on:click={() => ShapeSelectorLibrary.setSelectedItemId(shape.id)}
-            >
-              <div class="shape-selector-details">
-                <div class="shape-selector-item-image-div">
-                  <img
-                    class="shape-selector-item-image"
-                    src={shape.image}
-                    alt=""
-                  />
+          <div class="shape-selector-grid-inner">
+            {#each filteredShapes as shape (shape.id)}
+              <button
+                class="shape-selector-item {selectedItemIds.includes(shape.id)
+                  ? 'selected'
+                  : ''}"
+                on:mouseenter={() => (shape.hover = true)}
+                on:mouseleave={() => (shape.hover = false)}
+                on:focus={() => (shape.hover = true)}
+                on:blur={() => (shape.hover = false)}
+                on:click={() =>
+                  ShapeSelectorLibrary.setSelectedItemId(shape.id)}
+              >
+                <div class="shape-selector-details">
+                  <div class="shape-selector-item-image-div">
+                    <img
+                      class="shape-selector-item-image"
+                      src={shape.image}
+                      alt=""
+                    />
+                  </div>
+                  <div
+                    class="shape-selector-item-name {selectedItemIds.includes(
+                      shape.id,
+                    )
+                      ? 'font-selected'
+                      : ''}"
+                  >
+                    {shape.name}
+                  </div>
                 </div>
-                <div
-                  class="shape-selector-item-name {selectedItemIds.includes(
-                    shape.id,
-                  )
-                    ? 'font-selected'
-                    : ''}"
-                >
-                  {shape.name}
-                </div>
-              </div>
-            </button>
-          {/each}
+              </button>
+            {/each}
+          </div>
         </div>
-      </div>
       </div>
     </div>
     <div class="import-cancel-buttons-container">
