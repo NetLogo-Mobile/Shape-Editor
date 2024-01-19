@@ -38,14 +38,8 @@ export namespace R2 {
     const rect: DOMRect = canvas.getBoundingClientRect();
 
     return {
-      x:
-        Math.round(
-          (PRECISION * SCALE * (event.clientX - rect.left)) / rect.width,
-        ) / PRECISION,
-      y:
-        Math.round(
-          (PRECISION * SCALE * (event.clientY - rect.top)) / rect.height,
-        ) / PRECISION,
+      x: Math.round(PRECISION * SCALE * (event.clientX - rect.left) / rect.width) / PRECISION,
+      y: Math.round(PRECISION * SCALE * (event.clientY - rect.top) / rect.height) / PRECISION,
     };
   }
 
@@ -56,43 +50,31 @@ export namespace R2 {
    * @returns The distance between the two points.
    */
   export function l2(p1: R2, p2: R2): number {
-    return (
-      Math.round(
-        PRECISION * Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2),
-      ) / PRECISION
-    );
+    return Math.round(PRECISION * Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2)) / PRECISION;
   }
+}
+
+export type Shape = {
+  /** An array of points defining the shape. */
+  points: R2[];
+  /** The color of the shape. */
+  color: string;
+  /** The type of the shape. */
+  type: Shape.Type;
+  /** Indicates whether the shape is filled or not. */
+  filled: boolean;
 }
 
 /**
  * Class representing a shape.
  */
-export class Shape {
-  /** An array of points defining the shape. */
-  points: R2[];
-
-  /** The color of the shape. */
-  color: string;
-
-  /** The type of the shape. */
-  type: Shape.Type;
-
-  /** Indicates whether the shape is filled or not. */
-  filled: boolean;
-
-  constructor(points: R2[], color: string, type: Shape.Type, filled: boolean) {
-    this.points = points;
-    this.color = color;
-    this.type = type;
-    this.filled = filled;
-  }
-
+export namespace Shape {
   /**
    * Converts a JSONElement to a Shape.
    * @param shape - The JSONElement to be converted.
    * @returns The corresponding Shape.
    */
-  static fromJSON(shape: JSONElement): Shape {
+  export function fromJSON(shape: JSONElement): Shape {
     let points: R2[];
 
     switch (shape.type) {
@@ -124,7 +106,7 @@ export class Shape {
         break;
     }
 
-    return new Shape(points, shape.color, shape.type, shape.filled);
+    return { points, color: shape.color, type: shape.type, filled: shape.filled };
   }
 
   /**
@@ -132,8 +114,8 @@ export class Shape {
    * @param this - The Shape to be converted.
    * @returns The corresponding JSONElement.
    */
-  static toJSON(shape: Shape): JSONElement {
-    const common: JSONBaseElement = {
+  export function toJSON(shape: Shape): JSONElement {
+    let common: JSONBaseElement = {
       type: shape.type,
       color: shape.color,
       filled: shape.filled,
@@ -144,7 +126,7 @@ export class Shape {
       return {
         x: Math.round(PRECISION * point.x) / PRECISION,
         y: Math.round(PRECISION * point.y) / PRECISION,
-      };
+      }
     });
 
     switch (shape.type) {

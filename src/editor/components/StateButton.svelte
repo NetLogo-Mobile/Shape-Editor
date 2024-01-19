@@ -7,7 +7,7 @@ This component allows users to apply an operation to the shape stack.
 @param stateChange A function which changes the figure based on the current shape.
 -->
 <script lang="ts">
-  import type { Shape } from '../utils/geometry';
+  import type { Shape } from "../utils/geometry";
 
   /**
    * An operation which changes the figure based on the current shape.
@@ -17,7 +17,7 @@ This component allows users to apply an operation to the shape stack.
    */
   export let stateChange: (
     currentShape: Shape,
-    shapes: Shape[],
+    shapes: Shape[]
   ) => [Shape | null, Shape[]];
   /** An array of shapes that will be transformed when the button is clicked. */
   export let shapes: Shape[];
@@ -37,9 +37,13 @@ This component allows users to apply an operation to the shape stack.
   };
 </script>
 
+<button on:click={transformState}>
+  <slot />
+</button>
+
 <style lang="scss">
-  @import '../style/variables.scss';
-  @import '../style/button.scss';
+  @import "../style/variables.scss";
+  @import "../style/button.scss";
 
   button {
     background: $color1;
@@ -51,7 +55,3 @@ This component allows users to apply an operation to the shape stack.
     margin: 0.5em;
   }
 </style>
-
-<button on:click={transformState}>
-  <slot />
-</button>

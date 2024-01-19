@@ -9,7 +9,7 @@ This component allows users to apply an operation to the editor history.
 @param historyChange A function which changes the history.
 -->
 <script lang="ts">
-  import type { Shape } from '../utils/geometry';
+  import type { Shape } from "../utils/geometry";
 
   /**
    * An operation which changes the figure based on the current shape.
@@ -20,7 +20,7 @@ This component allows users to apply an operation to the editor history.
   export let historyChange: (
     undoStack: Shape[][],
     redoStack: Shape[][],
-    shapes: Shape[],
+    shapes: Shape[]
   ) => [Shape[][], Shape[][], Shape[]];
 
   /** An array of current shapes. */
@@ -36,18 +36,18 @@ This component allows users to apply an operation to the editor history.
    * Apply the operation to the history.
    */
   const changeHistory = () => {
-    [undoStack, redoStack, shapes] = historyChange(
-      undoStack,
-      redoStack,
-      shapes,
-    );
+    [undoStack, redoStack, shapes] = historyChange(undoStack, redoStack, shapes);
     currentShape = null;
   };
 </script>
 
+<button on:click={changeHistory}>
+  <slot />
+</button>
+
 <style lang="scss">
-  @import '../style/variables.scss';
-  @import '../style/button.scss';
+  @import "../style/variables.scss";
+  @import "../style/button.scss";
 
   button {
     background: $color1;
@@ -59,7 +59,3 @@ This component allows users to apply an operation to the editor history.
     margin: 0.5em;
   }
 </style>
-
-<button on:click={changeHistory}>
-  <slot />
-</button>

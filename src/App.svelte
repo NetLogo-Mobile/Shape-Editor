@@ -1,9 +1,38 @@
-<script>
-  import { GalapagosShapeSelectorDialog } from './ShapeSelectorDialog.ts';
-  import LibraryDialog from './LibraryDialog.svelte';
+<script lang="ts">
+  import { GalapagosShapeSelectorDialog } from './dialog/ShapeSelectorDialog';
+  import LibraryDialog from './dialog/LibraryDialog.svelte';
   import { onMount } from 'svelte';
   import { writable } from 'svelte/store';
   import { fade } from 'svelte/transition';
+
+  import Editor from "./editor/Editor.svelte";
+  import { Conversion } from './editor/utils/json.js';
+  import type { JSONShape } from "./editor/utils/json";
+
+  let open: (input?: JSONShape) => void;
+  let exported: string = "null";
+
+  // editor stuff
+  const openWrapper = (shape?: Object) => {
+    if (!shape) {
+      return () => {
+        open();
+      };
+    }
+
+    return () => {
+      try {
+        open(shape as JSONShape);
+      } catch (e) {
+        console.error(e);
+        exported = "undefined";
+      }
+    };
+  };
+
+  function closeHook(shape: JSONShape) {
+    ShapeSelectorDialog.createSVGShape(shape.name, Conversion.toSVG(shape));
+  }
 
   // dom elements
   let dialog;
@@ -644,6 +673,7 @@
   }
 </style>
 
+<Editor bind:open {closeHook} />
 <div>
   {#if libraryOpen}
     <LibraryDialog {closeLibrary} {addNewShapes} />
@@ -703,7 +733,7 @@
             <div class="shape-selector-buttons">
               <button
                 class="create-new-button"
-                on:click={ShapeSelectorDialog.createShape()}
+                on:click={openWrapper()}
                 ><img
                   class="button-image-right"
                   src="icons/create-new-icon.png"
@@ -738,7 +768,7 @@
                     >
                     <button
                       class="dropdown-button model-button"
-                      on:click={console.log('model')}
+                      on:click={() => console.log('model')}
                       ><img
                         class="button-image-left"
                         src="icons/model-icon.png"
@@ -755,7 +785,7 @@
           <input
             value={searchTerm}
             on:input={(event) =>
-              ShapeSelectorDialog.handleSearch(event.target.value)}
+              ShapeSelectorDialog.handleSearch(event.target)}
             placeholder="Search"
             style="background-image: url('icons/search-icon.png');"
           />

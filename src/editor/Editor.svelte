@@ -7,28 +7,28 @@ This component represents an editor for shapes drawn on the canvas.
 -->
 
 <script lang="ts">
-  import DrawButton from './components/DrawButton.svelte';
-  import { History, State, Tool } from './utils/state';
-  import Canvas from './components/Canvas.svelte';
-  import type { JSONShape } from './utils/json';
-  import TransformButton from './components/TransformButton.svelte';
-  import { R2, Shape, Transforms } from './utils/geometry';
-  import StateButton from './components/StateButton.svelte';
-  import HistoryButton from './components/HistoryButton.svelte';
-  import CanvasMirror from './components/CanvasMirror.svelte';
+  import DrawButton from "./components/DrawButton.svelte";
+  import { History, State, Tool } from "./utils/state";
+  import Canvas from "./components/Canvas.svelte";
+  import { type JSONShape, Validation } from "./utils/json";
+  import TransformButton from "./components/TransformButton.svelte";
+  import { R2, Shape, Transforms } from "./utils/geometry";
+  import StateButton from "./components/StateButton.svelte";
+  import HistoryButton from "./components/HistoryButton.svelte";
+  import CanvasMirror from "./components/CanvasMirror.svelte";
 
-  const DEFAULT_COLOR = '#ffffff';
+  const DEFAULT_COLOR = "#ffffff";
 
   /** The name of the shape. */
-  let name = 'default';
+  let name: string = "default";
   /** The current tool being used. */
   let currentTool: Tool = Tool.SELECT;
   /** The current drawing color. */
   let currentColor: string = DEFAULT_COLOR;
   /** The editable color index. */
-  let editableColorIndex = 0;
+  let editableColorIndex: number = 0;
   /** Whether shapes should be rotatable. */
-  let rotate = true;
+  let rotate: boolean = true;
 
   /** The array of shapes on the canvas. */
   let shapes: Shape[] = [];
@@ -40,7 +40,7 @@ This component represents an editor for shapes drawn on the canvas.
   let redoStack: Shape[][] = [];
 
   /** Whether the window is being moved. */
-  let moving = false;
+  let moving: boolean = false;
   /** Editor window. */
   let editor: HTMLDialogElement;
   /** Grabbed location. */
@@ -66,7 +66,7 @@ This component represents an editor for shapes drawn on the canvas.
    * Resets the editor.
    */
   const resetShape = () => {
-    name = 'default';
+    name = "default";
     currentTool = Tool.SELECT;
     currentColor = DEFAULT_COLOR;
     editableColorIndex = 0;
@@ -81,8 +81,13 @@ This component represents an editor for shapes drawn on the canvas.
   /**
    * Imports a shape into the editor.
    * @param shape The shape to import.
+   * @throws Error if the shape is invalid.
    */
   const importShape = (shape: JSONShape) => {
+    if (!Validation.validateJSONShape(shape)) {
+      throw new Error("Invalid shape.");
+    }
+
     name = shape.name;
     editableColorIndex = shape.editableColorIndex;
     rotate = shape.rotate;
@@ -163,141 +168,6 @@ This component represents an editor for shapes drawn on the canvas.
     }
   }
 </script>
-
-<style lang="scss">
-  @import './style/variables.scss';
-
-  .editor {
-    font-family: 'Lato';
-    border-radius: $corner-radius;
-    background: $color3;
-    border: 1px solid $color5;
-    box-shadow: 0px $corner-radius $corner-radius $shadow;
-    font-size: 12px;
-    padding: 0;
-    margin: 0;
-    position: absolute;
-    left: 3em;
-    top: 3em;
-  }
-
-  .title-bar {
-    top: 0;
-    left: 0;
-    right: 0;
-    display: flex;
-    justify-content: space-between;
-    background: $color4;
-    color: $color1;
-    box-shadow: 0px $corner-radius $corner-radius $shadow;
-    border-radius: $corner-radius $corner-radius 0px 0px;
-
-    * {
-      display: flex;
-      align-items: center;
-      display: inline;
-      margin: 1em;
-    }
-
-    button {
-      background: none;
-      border: none;
-      cursor: pointer;
-      margin: 1em;
-      padding: 0;
-      width: 1em;
-      height: 1em;
-
-      svg {
-        width: 100%;
-        height: 100%;
-        margin: 0;
-      }
-    }
-  }
-
-  .icon {
-    width: 1.5em;
-    height: 1.5em;
-    margin: 0;
-    align-self: center;
-
-    * {
-      stroke: $color6;
-      fill: $color6;
-      stroke-linejoin: round;
-      stroke-linecap: round;
-    }
-  }
-
-  .middle {
-    display: flex;
-    justify-content: space-between;
-  }
-
-  .tool {
-    background: $color1;
-    border: 1px solid $color2;
-  }
-
-  .tool-bar {
-    @extend .tool;
-    box-shadow: 0px $corner-radius $corner-radius $shadow;
-    border-radius: $corner-radius;
-    height: 3em;
-    margin-left: 2em;
-    margin-right: 2em;
-    display: flex;
-    justify-content: space-between;
-
-    div {
-      display: flex;
-    }
-  }
-
-  .tool-tray {
-    @extend .tool;
-    height: $canvas-size;
-    width: 10em;
-    margin: 2em 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .tool-tray-left {
-    @extend .tool-tray;
-    border-width: 1px 1px 1px 0px;
-    box-shadow: inset -2px $corner-radius $corner-radius $shadow;
-    border-radius: 0px $corner-radius $corner-radius 0px;
-    justify-content: center;
-
-    div {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 0.25em;
-    }
-
-    p {
-      margin: 0.5em;
-    }
-  }
-
-  .tool-tray-right {
-    @extend .tool-tray;
-    border-width: 1px 0px 1px 1px;
-    box-shadow: inset 2px $corner-radius $corner-radius $shadow;
-    border-radius: $corner-radius 0px 0px $corner-radius;
-
-    div {
-      display: flex;
-      flex-direction: row;
-    }
-  }
-</style>
 
 <dialog bind:this={editor} on:mousemove={handleMouseMove} class="editor">
   <div
@@ -852,3 +722,138 @@ This component represents an editor for shapes drawn on the canvas.
     </div>
   </div>
 </dialog>
+
+<style lang="scss">
+  @import "./style/variables.scss";
+
+  .editor {
+    font-family: "Lato";
+    border-radius: $corner-radius;
+    background: $color3;
+    border: 1px solid $color5;
+    box-shadow: 0px $corner-radius $corner-radius $shadow;
+    font-size: 12px;
+    padding: 0;
+    margin: 0;
+    position: absolute;
+    left: 3em;
+    top: 3em;
+  }
+
+  .title-bar {
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    background: $color4;
+    color: $color1;
+    box-shadow: 0px $corner-radius $corner-radius $shadow;
+    border-radius: $corner-radius $corner-radius 0px 0px;
+
+    * {
+      display: flex;
+      align-items: center;
+      display: inline;
+      margin: 1em;
+    }
+
+    button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      margin: 1em;
+      padding: 0;
+      width: 1em;
+      height: 1em;
+
+      svg {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+      }
+    }
+  }
+
+  .icon {
+    width: 1.5em;
+    height: 1.5em;
+    margin: 0;
+    align-self: center;
+
+    * {
+      stroke: $color6;
+      fill: $color6;
+      stroke-linejoin: round;
+      stroke-linecap: round;
+    }
+  }
+
+  .middle {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .tool {
+    background: $color1;
+    border: 1px solid $color2;
+  }
+
+  .tool-bar {
+    @extend .tool;
+    box-shadow: 0px $corner-radius $corner-radius $shadow;
+    border-radius: $corner-radius;
+    height: 3em;
+    margin-left: 2em;
+    margin-right: 2em;
+    display: flex;
+    justify-content: space-between;
+
+    div {
+      display: flex;
+    }
+  }
+
+  .tool-tray {
+    @extend .tool;
+    height: $canvas-size;
+    width: 10em;
+    margin: 2em 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .tool-tray-left {
+    @extend .tool-tray;
+    border-width: 1px 1px 1px 0px;
+    box-shadow: inset -2px $corner-radius $corner-radius $shadow;
+    border-radius: 0px $corner-radius $corner-radius 0px;
+    justify-content: center;
+
+    div {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 0.25em;
+    }
+
+    p {
+      margin: 0.5em;
+    }
+  }
+
+  .tool-tray-right {
+    @extend .tool-tray;
+    border-width: 1px 0px 1px 1px;
+    box-shadow: inset 2px $corner-radius $corner-radius $shadow;
+    border-radius: $corner-radius 0px 0px $corner-radius;
+
+    div {
+      display: flex;
+      flex-direction: row;
+    }
+  }
+</style>

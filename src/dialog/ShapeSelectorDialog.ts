@@ -1,5 +1,6 @@
 import { Shape } from './ShapeSelectorShape';
 import { GalapagosShapeSelectorDialogConfig } from './ShapeSelectorDialogConfig';
+import { JSONShape } from '../editor/utils/json';
 
 export class GalapagosShapeSelectorDialog {
   // Parent element where the dialog will be rendered
@@ -100,6 +101,31 @@ export class GalapagosShapeSelectorDialog {
       id: Math.max(...this.shapes.map((shape) => shape.id)) + 1,
       name: 'new default',
       image: 'shapes/down-arrow.png',
+      type: this.currentType,
+      hover: false,
+      deletable: true,
+      isDeleting: false,
+    };
+    // Add the new shape to the beginning of the shape array and update the filtered shape list
+    this.shapes.unshift(newShape);
+    this.shapes = [...this.shapes];
+    this.config.onUpdateShapes(this.shapes);
+    this.filterShapes(this.currentType);
+    this.config.onUpdateFilteredShapes(this.filteredShapes);
+  }
+
+  // Create shape from SVG
+  createSVGShape(name: string, svg: string) {
+    // convert svg to url encoding
+    const svgUrl = 'data:image/svg+xml;base64,' + btoa(`<svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">${svg}</svg>`);
+
+    // set imported shapes to empty
+    this.recentlyImportedShapeIds = [];
+    this.config.onUpdateRecentlyImportedShapes(this.recentlyImportedShapeIds);
+    const newShape: Shape = {
+      id: Math.max(...this.shapes.map((shape) => shape.id)) + 1,
+      name: name,
+      image: svgUrl,
       type: this.currentType,
       hover: false,
       deletable: true,

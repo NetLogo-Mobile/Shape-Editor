@@ -140,12 +140,12 @@ The `importShape` and `reset` functions should be bound to the editor.
 
     if (currentTool !== Tool.SELECT) {
       if (!currentShape) {
-        currentShape = new Shape(
-          [coords, coords],
-          currentColor,
-          Tool.shapeType(currentTool)!,
-          Tool.isFilled(currentTool),
-        );
+        currentShape = {
+          points: [coords, coords],
+          color: currentColor,
+          type: Tool.shapeType(currentTool)!,
+          filled: Tool.isFilled(currentTool),
+        };
       } else {
         currentShape.points[currentShape.points.length - 1] = coords;
         if (

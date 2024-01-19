@@ -1,4 +1,4 @@
-import { R2, Shape } from './geometry';
+import { R2, Shape } from "./geometry";
 
 /**
  * Enum representing the set of available tools.
@@ -82,7 +82,7 @@ export namespace State {
    */
   export function remove(
     currentShape: Shape,
-    shapes: Shape[],
+    shapes: Shape[]
   ): [Shape | null, Shape[]] {
     return [null, shapes.filter((shape) => shape !== currentShape)];
   }
@@ -95,7 +95,7 @@ export namespace State {
    */
   export function moveToTop(
     currentShape: Shape,
-    shapes: Shape[],
+    shapes: Shape[]
   ): [Shape | null, Shape[]] {
     return [
       currentShape,
@@ -111,7 +111,7 @@ export namespace State {
    */
   export function moveToBottom(
     currentShape: Shape,
-    shapes: Shape[],
+    shapes: Shape[]
   ): [Shape | null, Shape[]] {
     return [
       currentShape,
@@ -127,14 +127,9 @@ export namespace State {
    */
   export function duplicate(
     currentShape: Shape,
-    shapes: Shape[],
+    shapes: Shape[]
   ): [Shape | null, Shape[]] {
-    const newShape = new Shape(
-      currentShape.points,
-      currentShape.color,
-      currentShape.type,
-      currentShape.filled,
-    );
+    const newShape = structuredClone(currentShape);
     return [newShape, shapes.concat(newShape)];
   }
 }
@@ -149,7 +144,7 @@ export namespace History {
   export function undo(
     undoStack: Shape[][],
     redoStack: Shape[][],
-    shapes: Shape[],
+    shapes: Shape[]
   ): [Shape[][], Shape[][], Shape[]] {
     if (undoStack.length === 0) {
       return [undoStack, redoStack, shapes];
@@ -168,7 +163,7 @@ export namespace History {
   export function redo(
     undoStack: Shape[][],
     redoStack: Shape[][],
-    shapes: Shape[],
+    shapes: Shape[]
   ): [Shape[][], Shape[][], Shape[]] {
     if (redoStack.length === 0) {
       return [undoStack, redoStack, shapes];
