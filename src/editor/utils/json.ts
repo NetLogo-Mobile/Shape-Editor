@@ -240,7 +240,7 @@ export namespace Conversion {
    * @returns The SVG circle element.
    */
   function toSVGCircle(circle: JSONCircle): string {
-    return `<circle cx="${circle.x + circle.diam / 2}" cy="${circle.y + circle.diam / 2}" r="${circle.diam / 2}" stroke="${circle.color}" stroke-width="2" fill="${circle.filled ? circle.color : "none"}" />`;
+    return `<circle cx="${circle.x - circle.diam / 2}" cy="${circle.y - circle.diam / 2}" r="${circle.diam / 2}" stroke="${circle.color}" stroke-width="2" fill="${circle.filled ? circle.color : "none"}" />`;
   }
 
   /**
