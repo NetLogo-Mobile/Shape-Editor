@@ -43,6 +43,6 @@ If the selected tool is the selection tool, the current shape is also cleared.
   }
 </style>
 
-<button on:click={changeTool}>
+<button on:click={changeTool} class:selected={currentTool === tool}>
   <slot />
 </button>

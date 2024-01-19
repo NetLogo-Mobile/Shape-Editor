@@ -12,8 +12,13 @@ button {
   align-items: center;
   justify-content: center;
 
-  &:hover {
+  &:hover,
+  &.selected {
     background-color: $color5;
     box-shadow: inset 0px 4px 4px $shadow;
+  }
+
+  &:active {
+    background-color: darken($color5, 10%);
   }
 }

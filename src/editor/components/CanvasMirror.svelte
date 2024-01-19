@@ -12,13 +12,9 @@ This component provides a mirror of the canvas.
   import { Shape } from "../utils/geometry";
   import SvgShape from "./SVGShape.svelte";
 
-  /**
-   * The array of shapes on the canvas.
-   */
+  /** The array of shapes on the canvas. */
   export let shapes: Shape[];
-  /**
-   * The rotation to apply.
-   */
+  /** The rotation to apply. */
   export let rotate: number = 0;
 </script>
 
