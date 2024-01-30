@@ -11,6 +11,8 @@ import {
 export const SCALE = 300;
 /** A constant used to round coordinates. */
 export const PRECISION = 100;
+/** A constant used to represent the size of a grid cell. */
+export const GRID_SIZE = 15;
 
 /**
  * Represents a 2D point in the Cartesian coordinate system.
@@ -32,14 +34,16 @@ export namespace R2 {
    * Converts mouse position to canvas coordinates.
    * @param canvas - The HTML element representing the canvas.
    * @param event - The mouse event.
+   * @param snapToGrid - Indicates whether the coordinates should be snapped to the grid.
    * @returns A point representing the coordinates on the canvas.
    */
-  export function fromMouse(canvas: Element, event: MouseEvent): R2 {
+  export function fromMouse(canvas: Element, event: MouseEvent, snapToGrid: boolean = false): R2 {
     const rect: DOMRect = canvas.getBoundingClientRect();
+    const roundTo = snapToGrid ? GRID_SIZE : 1;
 
     return {
-      x: Math.round(PRECISION * SCALE * (event.clientX - rect.left) / rect.width) / PRECISION,
-      y: Math.round(PRECISION * SCALE * (event.clientY - rect.top) / rect.height) / PRECISION,
+      x: Math.round(Math.round(PRECISION * SCALE * (event.clientX - rect.left) / rect.width) / PRECISION / roundTo) * roundTo,
+      y: Math.round(Math.round(PRECISION * SCALE * (event.clientY - rect.top) / rect.height) / PRECISION / roundTo) * roundTo,
     };
   }
 

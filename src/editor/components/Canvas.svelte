@@ -6,6 +6,7 @@ Different drawing tools can be selected, including the selection tool, which all
 @param name The name of the shape. Should be bound.
 @param currentTool The current drawing tool. Should be bound.
 @param currentColor The current drawing color. Should be bound.
+@param snapToGrid A flag indicating whether to snap to grid. Should be bound.
 @param editableColorIndex The editable color index. Should be bound.
 @param rotate A flag indicating whether shapes should be rotatable. Should be bound.
 @param currentShape The current shape being drawn or manipulated. Should be bound.
@@ -16,12 +17,12 @@ The `importShape` and `reset` functions should be bound to the editor.
 -->
 
 <script lang="ts">
-  import EditHandle from './EditHandle.svelte';
-  import SvgShape from './SVGShape.svelte';
-  import { Tool } from '../utils/state';
-  import { R2, Shape } from '../utils/geometry';
+  import EditHandle from "./EditHandle.svelte";
+  import SvgShape from "./SVGShape.svelte";
+  import { Tool } from "../utils/state";
+  import { GRID_SIZE, R2, Shape } from "../utils/geometry";
 
-  const DEFAULT_COLOR = '#FFFFFF';
+  const DEFAULT_COLOR = "#FFFFFF";
 
   /** The current tool being used. */
   export let currentTool: Tool = Tool.SELECT;
@@ -29,6 +30,8 @@ The `importShape` and `reset` functions should be bound to the editor.
   export let currentColor: string = DEFAULT_COLOR;
   /** The current shape being drawn or manipulated. */
   export let currentShape: Shape | null = null;
+  /** Whether to snap to grid. */
+  export let snapToGrid: boolean = false;
   /** The array of shapes on the canvas. */
   export let shapes: Shape[] = [];
   /** A function to update the state. */
@@ -50,12 +53,12 @@ The `importShape` and `reset` functions should be bound to the editor.
   /** The current cursor. */
   $: cursor =
     currentTool !== Tool.SELECT
-      ? 'crosshair'
+      ? "crosshair"
       : grabbingHandle
-      ? 'grabbed'
-      : grabbingShape && currentShape !== null
-      ? 'move'
-      : 'default';
+        ? "grabbing"
+        : grabbingShape && currentShape !== null
+          ? "move"
+          : "default";
 
   /**
    * Handles a mouse movement event.
@@ -70,7 +73,7 @@ The `importShape` and `reset` functions should be bound to the editor.
       return;
     }
 
-    const coords = R2.fromMouse(canvas, event);
+    const coords = R2.fromMouse(canvas, event, snapToGrid);
 
     if (currentTool !== Tool.SELECT) {
       currentShape.points[currentShape.points.length - 1] = coords;
@@ -102,8 +105,11 @@ The `importShape` and `reset` functions should be bound to the editor.
    * @param event The mouse release event.
    */
   function handleRelease(event: MouseEvent) {
-    let coords = R2.fromMouse(canvas, event);
+    let coords = R2.fromMouse(canvas, event, snapToGrid);
     grabbingShape = false;
+    for (let i = 0; i < handles.length; i++) {
+      handlesGrabbed[i] = false;
+    }
 
     if (!currentShape) {
       return;
@@ -136,7 +142,7 @@ The `importShape` and `reset` functions should be bound to the editor.
       currentShape = null;
     }
 
-    let coords = R2.fromMouse(canvas, event);
+    let coords = R2.fromMouse(canvas, event, snapToGrid);
 
     if (currentTool !== Tool.SELECT) {
       if (!currentShape) {
@@ -180,18 +186,6 @@ The `importShape` and `reset` functions should be bound to the editor.
   }
 </script>
 
-<style lang="scss">
-  @import '../style/variables.scss';
-
-  .canvas {
-    width: $canvas-size;
-    height: $canvas-size;
-    background-color: $canvas-color;
-    border-radius: $corner-radius;
-    margin: 2em;
-  }
-</style>
-
 <svg
   on:mousemove={handleMove}
   on:mousedown={handleClick}
@@ -202,16 +196,6 @@ The `importShape` and `reset` functions should be bound to the editor.
   viewBox="0 0 300 300"
   {cursor}
 >
-  <g id="grid" stroke="rgba(255, 255, 255, 0.3)" stroke-width="0.5">
-    {#each { length: 21 } as _, i}
-      <line x1={i * 15} y1="0" x2={i * 15} y2="300" />
-    {/each}
-    <line x1="150" y1="0" x2="150" y2="300" />
-    {#each { length: 21 } as _, i}
-      <line x1="0" y1={i * 15} x2="300" y2={i * 15} />
-    {/each}
-    <line x1="0" y1="150" x2="300" y2="150" />
-  </g>
   <g id="shape">
     {#each shapes as shape}
       <SvgShape bind:shape bind:currentShape bind:currentTool />
@@ -236,4 +220,26 @@ The `importShape` and `reset` functions should be bound to the editor.
     {/if}
   </g>
   <slot />
+  <g id="grid" stroke="rgba(255, 255, 255, 0.3)" stroke-width="0.5">
+    {#each { length: 21 } as _, i}
+      <line x1={i * GRID_SIZE} y1="0" x2={i * GRID_SIZE} y2="300" />
+    {/each}
+    <line x1="150" y1="0" x2="150" y2="300" />
+    {#each { length: 21 } as _, i}
+      <line x1="0" y1={i * GRID_SIZE} x2="300" y2={i * GRID_SIZE} />
+    {/each}
+    <line x1="0" y1="150" x2="300" y2="150" />
+  </g>
 </svg>
+
+<style lang="scss">
+  @import "../style/variables.scss";
+
+  .canvas {
+    width: $canvas-size;
+    height: $canvas-size;
+    background-color: $canvas-color;
+    border-radius: $corner-radius;
+    margin: 2em;
+  }
+</style>

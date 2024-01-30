@@ -29,6 +29,8 @@ This component represents an editor for shapes drawn on the canvas.
   let editableColorIndex: number = 0;
   /** Whether shapes should be rotatable. */
   let rotate: boolean = true;
+  /** Whether to snap to the grid. */
+  let snapToGrid: boolean = false;
 
   /** The array of shapes on the canvas. */
   let shapes: Shape[] = [];
@@ -468,8 +470,9 @@ This component represents an editor for shapes drawn on the canvas.
     <Canvas
       bind:currentTool
       bind:currentColor
-      bind:shapes
       bind:currentShape
+      bind:snapToGrid
+      bind:shapes
       {pushState}
     />
     <div class="tool-tray-right">
@@ -719,6 +722,8 @@ This component represents an editor for shapes drawn on the canvas.
         <br />
         Rotatable <input type="checkbox" bind:checked={rotate} />
       {/if}
+      <br />
+      Snap to Grid <input type="checkbox" bind:checked={snapToGrid} />
     </div>
   </div>
 </dialog>
